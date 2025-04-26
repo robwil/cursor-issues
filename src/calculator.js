@@ -3,6 +3,7 @@
 import { sum } from "./commands/sum.js";
 import { subtract } from "./commands/subtract.js";
 import { multiply } from "./commands/multiply.js";
+import { divide } from "./commands/divide.js";
 
 /**
  * Main calculator function that processes command line arguments
@@ -32,6 +33,13 @@ function main() {
   console.log(`Sum: ${num1} + ${num2} = ${sum(num1, num2)}`);
   console.log(`Subtract: ${num1} - ${num2} = ${subtract(num1, num2)}`);
   console.log(`Multiply: ${num1} * ${num2} = ${multiply(num1, num2)}`);
+
+  // Add divide operation
+  try {
+    console.log(`Divide: ${num1} / ${num2} = ${divide(num1, num2)}`);
+  } catch (error) {
+    console.error(`Division Error: ${error.message}`);
+  }
 }
 
 // Run the main function

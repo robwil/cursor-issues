@@ -34,6 +34,8 @@ Output:
 ```
 Sum: 5 + 3 = 8
 Subtract: 5 - 3 = 2
+Multiply: 5 * 3 = 15
+Divide: 5 / 3 = 1.6666666666666667
 ```
 
 ## Testing
@@ -48,3 +50,5 @@ npm test
 
 - `sum`: Adds two numbers together
 - `subtract`: Subtracts the second number from the first 
+- `multiply`: Multiplies two numbers together
+- `divide`: Divides the first number by the second 
