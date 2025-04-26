@@ -1,0 +1,25 @@
+{
+  "name": "cursor-issues",
+  "version": "1.0.0",
+  "type": "module",
+  "main": "src/calculator.js",
+  "scripts": {
+    "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js",
+    "start": "node src/calculator.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Kartones/cursor-issues.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Kartones/cursor-issues/issues"
+  },
+  "homepage": "https://github.com/Kartones/cursor-issues#readme",
+  "description": "",
+  "devDependencies": {
+    "jest": "^29.7.0"
+  }
+}
