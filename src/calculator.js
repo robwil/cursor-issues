@@ -2,6 +2,7 @@
 
 import { sum } from "./commands/sum.js";
 import { subtract } from "./commands/subtract.js";
+import { multiply } from "./commands/multiply.js";
 
 /**
  * Main calculator function that processes command line arguments
@@ -30,6 +31,7 @@ function main() {
   // Calculate and output results
   console.log(`Sum: ${num1} + ${num2} = ${sum(num1, num2)}`);
   console.log(`Subtract: ${num1} - ${num2} = ${subtract(num1, num2)}`);
+  console.log(`Multiply: ${num1} * ${num2} = ${multiply(num1, num2)}`);
 }
 
 // Run the main function
