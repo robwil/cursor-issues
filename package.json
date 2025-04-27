@@ -2,10 +2,14 @@
   "name": "cursor-issues",
   "version": "1.0.0",
   "type": "module",
-  "main": "src/calculator.js",
+  "main": "src/calculator.mjs",
   "scripts": {
-    "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js",
-    "start": "node src/calculator.js"
+    "test": "bazelisk test //tests:all",
+    "test:sum": "bazelisk test //tests:sum_test",
+    "test:subtract": "bazelisk test //tests:subtract_test",
+    "test:multiply": "bazelisk test //tests:multiply_test",
+    "test:divide": "bazelisk test //tests:divide_test",
+    "start": "node src/calculator.mjs"
   },
   "repository": {
     "type": "git",

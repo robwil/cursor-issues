@@ -1,9 +1,9 @@
 #!/usr/bin/env node
 
-import { sum } from "./commands/sum.js";
-import { subtract } from "./commands/subtract.js";
-import { multiply } from "./commands/multiply.js";
-import { divide } from "./commands/divide.js";
+import { sum } from "./commands/sum.mjs";
+import { subtract } from "./commands/subtract.mjs";
+import { multiply } from "./commands/multiply.mjs";
+import { divide } from "./commands/divide.mjs";
 
 /**
  * Main calculator function that processes command line arguments
@@ -15,7 +15,7 @@ function main() {
 
   // Check if we have exactly two arguments
   if (args.length !== 2) {
-    console.error("Usage: node calculator.js <number1> <number2>");
+    console.error("Usage: node calculator.mjs <number1> <number2>");
     process.exit(1);
   }
 
