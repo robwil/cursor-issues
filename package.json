@@ -5,7 +5,7 @@
   "types": "dist/calculator.d.ts",
   "scripts": {
     "build": "tsc",
-    "start": "npm run build && node dist/calculator.js",
+    "start": "ts-node src/calculator.ts",
     "test": "jest --config jest.config.cjs",
     "test:sum": "jest tests/sum.test.ts --config jest.config.cjs",
     "test:subtract": "jest tests/subtract.test.ts --config jest.config.cjs",
