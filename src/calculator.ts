@@ -4,6 +4,7 @@ import { sum } from "./commands/sum";
 import { subtract } from "./commands/subtract";
 import { multiply } from "./commands/multiply";
 import { divide } from "./commands/divide";
+import { power } from "./commands/power";
 
 /**
  * Main calculator function that processes command line arguments
@@ -44,6 +45,9 @@ function main(): void {
       console.error('An unknown error occurred during division');
     }
   }
+
+  // Add power operation
+  console.log(`Power: ${num1} ^ ${num2} = ${power(num1, num2)}`);
 }
 
 // Run the main function
