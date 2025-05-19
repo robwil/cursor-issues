@@ -51,6 +51,7 @@ export function startCalculatorUI(): void {
   let waitingForSecondOperand = false;
   let operator: string | null = null;
   let statusText = 'Ready';
+  let keyboardModeActive = false;
 
   // Main container
   const container = blessed.box({
@@ -112,10 +113,26 @@ export function startCalculatorUI(): void {
     }
   });
 
+  // Keyboard mode indicator
+  const keyboardIndicator = blessed.box({
+    top: 5,
+    left: 1,
+    width: 15,
+    height: 1,
+    content: '⌨️ OFF',
+    align: 'left',
+    tags: true,
+    style: {
+      fg: 'gray',
+      bold: true
+    }
+  });
+
   // Update the display
   const updateDisplay = () => {
     display.setContent(displayValue);
     status.setContent(statusText);
+    keyboardIndicator.setContent(keyboardModeActive ? '{bold}{green-fg}⌨️ ON{/}' : '{gray-fg}⌨️ OFF{/}');
     screen.render();
   };
 
@@ -254,13 +271,15 @@ export function startCalculatorUI(): void {
   };
 
   // Create calculator buttons using regular boxes instead of buttons
-  const createButton = (label: string, top: number, left: number, width: number, height: number, callback: () => void, color: string = 'white', bg: string = 'blue') => {
+  const createButton = (label: string, top: number, left: number, width: number, height: number, callback: () => void, color: string = 'white', bg: string = 'blue', keyChar: string | null = null) => {
+    const buttonLabel = keyChar ? `${label} (${keyChar})` : label;
+    
     const button = blessed.box({
       top,
       left,
       width,
       height,
-      content: label,
+      content: buttonLabel,
       align: 'center',
       valign: 'middle',
       tags: true,
@@ -281,6 +300,11 @@ export function startCalculatorUI(): void {
       mouse: true
     });
     
+    // Store a reference to the button if it has a key shortcut
+    if (keyChar) {
+      buttonRefs[keyChar] = { element: button, originalBg: bg };
+    }
+    
     // Handle mouse events
     button.on('click', () => {
       callback();
@@ -291,21 +315,100 @@ export function startCalculatorUI(): void {
     return button;
   };
 
+  // Store references to buttons for keyboard highlighting
+  const buttonRefs: Record<string, { element: blessed.Widgets.BoxElement, originalBg: string }> = {};
+
+  // Highlight button when key is pressed
+  const highlightButton = (key: string) => {
+    if (buttonRefs[key]) {
+      const { element, originalBg } = buttonRefs[key];
+      // Flash the button
+      element.style.bg = 'white';
+      element.style.fg = 'black';
+      screen.render();
+      
+      // Reset after a short delay
+      setTimeout(() => {
+        element.style.bg = originalBg;
+        element.style.fg = originalBg === 'yellow' || originalBg === 'green' ? 'black' : 'white';
+        screen.render();
+      }, 150);
+    }
+  };
+
+  // Toggle keyboard mode
+  const toggleKeyboardMode = () => {
+    keyboardModeActive = !keyboardModeActive;
+    statusText = keyboardModeActive ? 'Keyboard mode activated' : 'Keyboard mode deactivated';
+    updateDisplay();
+  };
+
   // Add keyboard support for number keys, operations, and equals
   screen.key(['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'], (ch, key) => {
     inputDigit(key.name);
+    highlightButton(key.name);
+  });
+
+  screen.key('.', () => {
+    if (!displayValue.includes('.')) {
+      displayValue += '.';
+      updateDisplay();
+    }
+    highlightButton('.');
   });
   
-  screen.key(['+'], () => handleOperator('+'));
-  screen.key(['-'], () => handleOperator('-'));
-  screen.key(['*'], () => handleOperator('*'));
-  screen.key(['/'], () => handleOperator('/'));
-  screen.key(['^'], () => handleOperator('^'));
-  screen.key(['=', 'return'], () => handleEquals());
-  screen.key(['c'], () => clearCalculator());
-  screen.key(['m'], () => memoryStore());
-  screen.key(['r'], () => memoryRecall());
-  screen.key(['x'], () => memoryClear());
+  screen.key('+', () => {
+    handleOperator('+');
+    highlightButton('+');
+  });
+  
+  screen.key('-', () => {
+    handleOperator('-');
+    highlightButton('-');
+  });
+  
+  screen.key('*', () => {
+    handleOperator('*');
+    highlightButton('*');
+  });
+  
+  screen.key('/', () => {
+    handleOperator('/');
+    highlightButton('/');
+  });
+  
+  screen.key('^', () => {
+    handleOperator('^');
+    highlightButton('^');
+  });
+  
+  screen.key(['=', 'return', 'enter'], () => {
+    handleEquals();
+    highlightButton('=');
+  });
+  
+  screen.key('c', () => {
+    clearCalculator();
+    highlightButton('c');
+  });
+  
+  screen.key('m', () => {
+    memoryStore();
+    highlightButton('m');
+  });
+  
+  screen.key('r', () => {
+    memoryRecall();
+    highlightButton('r');
+  });
+  
+  screen.key('x', () => {
+    memoryClear();
+    highlightButton('x');
+  });
+
+  // Toggle keyboard mode with F1 key
+  screen.key('f1', toggleKeyboardMode);
 
   // Number buttons
   const buttonWidth = 8;
@@ -318,7 +421,7 @@ export function startCalculatorUI(): void {
     const digit = String(i);
     createButton(digit, row, col, buttonWidth, buttonHeight, () => {
       inputDigit(digit);
-    });
+    }, 'white', 'blue', digit);
     col += buttonWidth + 1;
     if (i % 3 === 0) {
       row += buttonHeight + 1;
@@ -329,7 +432,7 @@ export function startCalculatorUI(): void {
   // Zero button
   createButton('0', row, col, buttonWidth, buttonHeight, () => {
     inputDigit('0');
-  });
+  }, 'white', 'blue', '0');
 
   // Decimal button
   createButton('.', row, col + buttonWidth + 1, buttonWidth, buttonHeight, () => {
@@ -337,7 +440,7 @@ export function startCalculatorUI(): void {
       displayValue += '.';
       updateDisplay();
     }
-  });
+  }, 'white', 'blue', '.');
 
   // Operation buttons
   row = 7;
@@ -345,59 +448,65 @@ export function startCalculatorUI(): void {
   
   createButton('+', row, col, buttonWidth, buttonHeight, () => {
     handleOperator('+');
-  }, 'white', 'red');
+  }, 'white', 'red', '+');
   
   createButton('-', row + buttonHeight + 1, col, buttonWidth, buttonHeight, () => {
     handleOperator('-');
-  }, 'white', 'red');
+  }, 'white', 'red', '-');
   
   createButton('×', row + (buttonHeight + 1) * 2, col, buttonWidth, buttonHeight, () => {
     handleOperator('*');
-  }, 'white', 'red');
+  }, 'white', 'red', '*');
   
   createButton('÷', row + (buttonHeight + 1) * 3, col, buttonWidth, buttonHeight, () => {
     handleOperator('/');
-  }, 'white', 'red');
+  }, 'white', 'red', '/');
   
   // Power button
   createButton('^', row + (buttonHeight + 1) * 4, 1, buttonWidth, buttonHeight, () => {
     handleOperator('^');
-  }, 'white', 'magenta');
+  }, 'white', 'magenta', '^');
   
   // Equals button - highlight this with a different style
   createButton('=', row + (buttonHeight + 1) * 4, col, buttonWidth, buttonHeight, () => {
     handleEquals();
-  }, 'black', 'green');
+  }, 'black', 'green', '=');
   
   // Clear button
   createButton('C', row + (buttonHeight + 1) * 4, 1 + buttonWidth + 1, buttonWidth, buttonHeight, () => {
     clearCalculator();
-  }, 'black', 'yellow');
+  }, 'black', 'yellow', 'c');
   
   // Memory buttons
   createButton('M+', row + (buttonHeight + 1) * 4, 1 + (buttonWidth + 1) * 2, buttonWidth, buttonHeight, () => {
     memoryStore();
-  }, 'white', 'cyan');
+  }, 'white', 'cyan', 'm');
   
   createButton('MR', row + (buttonHeight + 1) * 4, 1 + (buttonWidth + 1) * 3, buttonWidth, buttonHeight, () => {
     memoryRecall();
-  }, 'white', 'cyan');
+  }, 'white', 'cyan', 'r');
   
   createButton('MC', row + (buttonHeight + 1) * 4 - buttonHeight - 1, 1 + (buttonWidth + 1) * 3, buttonWidth, buttonHeight, () => {
     memoryClear();
-  }, 'white', 'cyan');
+  }, 'white', 'cyan', 'x');
+
+  // Keyboard mode toggle
+  createButton('F1: ⌨️', 1, 2, 10, 3, () => {
+    toggleKeyboardMode();
+  }, 'black', 'white');
 
   // Add components to screen
   container.append(title);
   container.append(display);
   container.append(status);
+  container.append(keyboardIndicator);
   screen.append(container);
 
   // Add instruction text
   const instructions = blessed.text({
     bottom: 0,
     left: 'center',
-    content: 'Mouse: Click buttons | Keyboard: Numbers, +, -, *, /, ^, =, Enter, c, m, r, x | ESC/q to exit',
+    content: 'Mouse: Click buttons | Keyboard: Numbers, +, -, *, /, ^, =, Enter, c, m, r, x | F1: Toggle keyboard | ESC/q to exit',
     style: {
       fg: 'white',
     }
