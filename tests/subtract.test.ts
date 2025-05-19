@@ -1,9 +1,9 @@
-import { subtract } from "../src/commands/subtract.mjs";
+import { subtract } from "../src/commands/subtract";
 
 describe('subtract function', () => {
   console.log("Testing subtract command...");
 
-  test('subtracts two positive numbers correctly', () => {
+  test('subtracts positive numbers correctly', () => {
     expect(subtract(5, 3)).toBe(2);
   });
 
@@ -14,12 +14,12 @@ describe('subtract function', () => {
   });
 
   test('handles zero', () => {
+    expect(subtract(3, 0)).toBe(3);
     expect(subtract(0, 3)).toBe(-3);
-    expect(subtract(2, 0)).toBe(2);
     expect(subtract(0, 0)).toBe(0);
   });
 
   afterAll(() => {
     console.log("All subtract tests passed!");
   });
-});
+}); 

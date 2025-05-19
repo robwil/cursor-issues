@@ -1,15 +1,16 @@
 {
   "name": "cursor-issues",
   "version": "1.0.0",
-  "type": "module",
-  "main": "src/calculator.mjs",
+  "main": "dist/calculator.js",
+  "types": "dist/calculator.d.ts",
   "scripts": {
-    "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js",
-    "test:sum": "node --experimental-vm-modules node_modules/jest/bin/jest.js tests/sum.test.mjs",
-    "test:subtract": "node --experimental-vm-modules node_modules/jest/bin/jest.js tests/subtract.test.mjs",
-    "test:multiply": "node --experimental-vm-modules node_modules/jest/bin/jest.js tests/multiply.test.mjs",
-    "test:divide": "node --experimental-vm-modules node_modules/jest/bin/jest.js tests/divide.test.mjs",
-    "start": "node src/calculator.mjs"
+    "build": "tsc",
+    "start": "ts-node src/calculator.ts",
+    "test": "jest --config jest.config.cjs",
+    "test:sum": "jest tests/sum.test.ts --config jest.config.cjs",
+    "test:subtract": "jest tests/subtract.test.ts --config jest.config.cjs",
+    "test:multiply": "jest tests/multiply.test.ts --config jest.config.cjs",
+    "test:divide": "jest tests/divide.test.ts --config jest.config.cjs"
   },
   "repository": {
     "type": "git",
@@ -24,6 +25,11 @@
   "homepage": "https://github.com/robwil/cursor-issues#readme",
   "description": "",
   "devDependencies": {
-    "jest": "^29.5.0"
+    "@types/jest": "^29.5.0",
+    "@types/node": "^20.10.0",
+    "jest": "^29.5.0",
+    "ts-jest": "^29.1.0",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.3.2"
   }
 }
