@@ -13,14 +13,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Kartones/cursor-issues.git"
+    "url": "git+https://github.com/robwil/cursor-issues.git"
   },
   "keywords": [],
   "author": "",
   "license": "The Unlicense",
   "bugs": {
-    "url": "https://github.com/Kartones/cursor-issues/issues"
+    "url": "https://github.com/robwil/cursor-issues/issues"
   },
-  "homepage": "https://github.com/Kartones/cursor-issues#readme",
+  "homepage": "https://github.com/robwil/cursor-issues#readme",
   "description": ""
 }

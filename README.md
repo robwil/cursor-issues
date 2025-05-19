@@ -5,7 +5,7 @@ A simple Node.js calculator CLI application that performs arithmetic operations.
 ## Installation
 
 ```bash
-git clone git@github.com:Kartones/cursor-issues.git
+git clone git@github.com:robwil/cursor-issues.git
 cd cursor-issues
 npm install
 ```
