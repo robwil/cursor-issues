@@ -18,20 +18,33 @@ Follow these steps in order:
    gh api --method PATCH repos/robwil/cursor-issues -f has_issues=true
    ```
 
+4. Ensure required labels exist:
+   ```bash
+   # Create WIP label if it doesn't exist
+   gh api repos/robwil/cursor-issues/labels -f name="WIP" -f color="FF0000" -f description="Work in progress" || true
+   
+   # Create ready-for-review label if it doesn't exist
+   gh api repos/robwil/cursor-issues/labels -f name="ready-for-review" -f color="0E8A16" -f description="PR created and ready for review" || true
+   ```
+
 ## Issue Management
 1. Check for open issues with the "WIP" label:
    ```bash
    gh issue list --label WIP
    ```
 
-2. If no issues have the "WIP" label:
-   - Get the oldest open issue: `gh issue list --limit 1 --state open`
-   - If the "WIP" label doesn't exist, create it: 
+2. If there are issues with the "WIP" label, select the oldest one to work on.
+
+3. If no issues have the "WIP" label:
+   - Get the oldest open issue that doesn't have the "ready-for-review" label:
      ```bash
-     gh api repos/robwil/cursor-issues/labels -f name="WIP" -f color="FF0000" -f description="Work in progress"
+     gh issue list --limit 10 --state open --json number,title,labels --jq '.[] | select(.labels | map(.name) | index("ready-for-review") | not) | [.number, .title] | @tsv' | sort -n | head -1
      ```
-   - Add the "WIP" label to the oldest issue: `gh issue edit <issue-number> --add-label "WIP"`
-   - If there are no open issues, **STOP HERE**
+   - If an issue is found, add the "WIP" label to it:
+     ```bash
+     gh issue edit <issue-number> --add-label "WIP"
+     ```
+   - If there are no eligible open issues, **STOP HERE**
 
 ## Implementation
 1. Create a new Git branch to work on the issue:
@@ -57,8 +70,11 @@ Follow these steps in order:
 
 ## Completion and Pull Request
 1. When all tasks are completed:
-   - Push your branch to GitHub: `git push -u origin gh-issue-<issue-number>`
-   - Remove the "WIP" label: `gh issue edit <issue-number> --remove-label WIP`
+   - Push your branch to GitHub: 
+     ```bash
+     git push -u origin gh-issue-<issue-number>
+     ```
+   
    - Create a pull request:
      ```bash
      # Create a file with the PR description 
@@ -74,8 +90,18 @@ Follow these steps in order:
      # Create the PR using the file
      gh pr create --title "Fix issue #<issue-number>" --body-file pr-body.txt
      ```
+   
+   - Update issue labels:
+     ```bash
+     # Remove the WIP label
+     gh issue edit <issue-number> --remove-label WIP
+     
+     # Add the ready-for-review label
+     gh issue edit <issue-number> --add-label "ready-for-review"
+     ```
 
 ## Troubleshooting
 - If the `gh` command fails with authentication errors, try: `gh auth status` and `gh auth login`
 - If you receive "repository not found" errors, check that you're using the correct repository name
 - If issue operations fail, verify that issues are enabled for the repository
+- If you get a "label not found" error, ensure you've run the setup steps to create the required labels
