@@ -508,9 +508,6 @@ export function startCalculatorUI(): void {
   let row = 7;
   let col = 1;
 
-  // Save the position below 9 for equals button
-  const nineButtonRow = row + (buttonHeight + 1) * 2; // After 2 rows (1-3, 4-6, 7-9)
-  const nineButtonCol = col + (buttonWidth + 1) * 2; // After 2 columns (7, 8, 9)
 
   // Numbers 1-9
   for (let i = 1; i <= 9; i++) {
@@ -538,10 +535,9 @@ export function startCalculatorUI(): void {
     }
   });
 
-  // Equals button - place below 9 and to the right of decimal point
-  createButton('=', nineButtonRow, nineButtonCol, buttonWidth, buttonHeight, () => {
+  createButton('=', row, col + (buttonWidth + 1) * 2, buttonWidth, buttonHeight, () => {
     handleEquals();
-  }, 'black', 'green');
+  }, 'white', 'yellow');
 
   // Operation buttons
   row = 7;
@@ -568,12 +564,11 @@ export function startCalculatorUI(): void {
     handleOperator('^');
   }, 'white', 'magenta');
   
-  // Clear button
-  createButton('C', row + (buttonHeight + 1) * 4, 1 + buttonWidth + 1, buttonWidth, buttonHeight, () => {
-    clearCalculator();
-  }, 'black', 'yellow');
-  
   // Memory buttons
+  createButton('MC', row + (buttonHeight + 1) * 4, 1 + (buttonWidth + 1), buttonWidth, buttonHeight, () => {
+    memoryClear();
+  }, 'white', 'cyan');
+
   createButton('M+', row + (buttonHeight + 1) * 4, 1 + (buttonWidth + 1) * 2, buttonWidth, buttonHeight, () => {
     memoryStore();
   }, 'white', 'cyan');
@@ -582,9 +577,11 @@ export function startCalculatorUI(): void {
     memoryRecall();
   }, 'white', 'cyan');
   
-  createButton('MC', row + (buttonHeight + 1) * 4 - buttonHeight - 1, 1 + (buttonWidth + 1) * 3, buttonWidth, buttonHeight, () => {
-    memoryClear();
-  }, 'white', 'cyan');
+  // Clear button
+  row = row + (buttonHeight + 1) * 5 - 1;
+  createButton('C', row, 1 + buttonWidth + 1, buttonWidth * 2 + 1, buttonHeight, () => {
+    clearCalculator();
+    }, 'white', 'yellow');
 
   // Help button
   createButton('?', 0, 1, 3, 3, () => {
