@@ -1,7 +1,0 @@
-load("@aspect_rules_js//js:defs.bzl", "js_library")
-
-# Export package files
-exports_files([
-    "package-lock.json",
-    "package.json",
-])
