@@ -93,6 +93,7 @@ Follow these steps in order:
      ```
    
    - YOU MUST make a separate commit for each task
+   - The commits MUST be tagged with `-c user.name` and `-c user.email` as specified above.
    - do NOT combine multiple tasks into a single commit
 
 ## Completion and Pull Request
@@ -130,15 +131,15 @@ Follow these steps in order:
      ```
 
 ## Cleanup
-1. Return to the master branch:
-   ```bash
-   git checkout master
-   ```
-
-2. Optional: Remove any temporary files created during the workflow:
+1. Optional: Remove any temporary files created during the workflow:
    ```bash
    # Remove temporary files if they exist
    rm -f issue-body.txt pr-body.txt
+   ```
+
+2. After creating the pull request, always return to the master branch:
+   ```bash
+   git checkout master
    ```
 
 ## Troubleshooting
