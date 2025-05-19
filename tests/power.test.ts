@@ -1,4 +1,5 @@
 import { power } from "../src/commands/power";
+import BigNumber from 'bignumber.js';
 
 describe('power function', () => {
   console.log("Testing power command...");
@@ -27,6 +28,12 @@ describe('power function', () => {
   test('calculates with negative exponent', () => {
     expect(power(2, -1)).toBe(0.5);
     expect(power(2, -2)).toBe(0.25);
+  });
+
+  test('handles larger numbers that would overflow in standard Math.pow', () => {
+    // Calculate manually what the result should be using BigNumber
+    const expected = new BigNumber(2).exponentiatedBy(50).toNumber();
+    expect(power(2, 50)).toBe(expected);
   });
 
   afterAll(() => {
