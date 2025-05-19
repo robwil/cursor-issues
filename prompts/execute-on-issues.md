@@ -1,8 +1,20 @@
 # GitHub Issue Processing Workflow
 
+> ## ⚠️ CRITICAL WORKFLOW REQUIREMENTS ⚠️
+> 
+> 1. **COMMIT EACH TASK INDIVIDUALLY** - Do not combine multiple tasks in one commit
+> 2. **USE PROPER GIT AUTHOR CONFIG** - All commits must use:
+>    ```bash
+>    git -c user.name="Cursor AI" -c user.email="agent@cursor.tools" commit -m "Task: Description"
+>    ```
+> 3. **UPDATE ISSUE AFTER EACH TASK** - Mark each task complete in the issue before moving to the next
+> 4. **FOLLOW THE EXACT SEQUENCE** - Do not skip any steps in this workflow
+
+---
+
 Follow these steps in order:
 
-## Setup
+## 1️⃣ Setup
 1. Configure the GitHub CLI by running:
    ```bash
    export GH_HOST=github.com
@@ -27,7 +39,9 @@ Follow these steps in order:
    gh api repos/robwil/cursor-issues/labels -f name="ready-for-review" -f color="0E8A16" -f description="PR created and ready for review" || true
    ```
 
-## Issue Management
+---
+
+## 2️⃣ Issue Management
 1. Check for open issues with the "WIP" label:
    ```bash
    gh issue list --label WIP
@@ -46,7 +60,9 @@ Follow these steps in order:
      ```
    - If there are no eligible open issues, **STOP HERE**
 
-## Implementation
+---
+
+## 3️⃣ Implementation
 1. Create a new Git branch to work on the issue:
    ```bash
    git checkout -b gh-issue-<issue-number>
@@ -57,46 +73,50 @@ Follow these steps in order:
    gh issue view <issue-number> --json body,title,number
    ```
    
-   You MUST check the issue body for any task list (items prefixed with "- [ ]") and implement each task in order. 
+   **YOU MUST** check the issue body for any task list (items prefixed with "- [ ]") and implement each task in order. 
    If no task list exists, break down the issue into logical tasks yourself.
 
-3. IMPORTANT: After completing EACH individual task (not the entire issue at once):
-   - Update the issue to mark the task as completed:
-     ```bash
-     # Get the issue content with body
-     gh issue view <issue-number> --json body,title,number
-     
-     # Then update the issue, marking ONLY the completed task with [x] 
-     # For example, if the body was:
-     #   - [ ] Task 1
-     #   - [ ] Task 2
-     # After completing Task 1, update it to:
-     #   - [x] Task 1
-     #   - [ ] Task 2
-     
-     # Create a file with the updated issue body
-     cat > issue-body.txt << EOF
-     <Copy the current body here and update the appropriate task>
-     EOF
-     
-     # Update the issue body
-     gh issue edit <issue-number> --body-file issue-body.txt
-     ```
-   
-   - Commit your changes with a descriptive message for the SPECIFIC task:
-     ```bash
-     # Stage your changes
-     git add <changed-files>
-     
-     # Commit with the AI agent identity using explicit author name and email
-     git -c user.name="Cursor AI" -c user.email="agent@cursor.tools" commit -m "Task: Description of the specific task just completed"
-     ```
-   
-   - YOU MUST make a separate commit for each task
-   - The commits MUST be tagged with `-c user.name` and `-c user.email` as specified above.
-   - do NOT combine multiple tasks into a single commit
+3. **⚠️ IMPORTANT**: After completing **EACH INDIVIDUAL TASK** (not the entire issue at once):
 
-## Completion and Pull Request
+   **STEP 3A**: Update the issue to mark the task as completed:
+   ```bash
+   # Get the issue content with body
+   gh issue view <issue-number> --json body,title,number
+   
+   # Then update the issue, marking ONLY the completed task with [x] 
+   # For example, if the body was:
+   #   - [ ] Task 1
+   #   - [ ] Task 2
+   # After completing Task 1, update it to:
+   #   - [x] Task 1
+   #   - [ ] Task 2
+   
+   # Create a file with the updated issue body
+   cat > issue-body.txt << EOF
+   <Copy the current body here and update the appropriate task>
+   EOF
+   
+   # Update the issue body
+   gh issue edit <issue-number> --body-file issue-body.txt
+   ```
+   
+   **STEP 3B**: Commit your changes with a descriptive message for the **SPECIFIC TASK**:
+   ```bash
+   # Stage your changes
+   git add <changed-files>
+   
+   # Commit with the AI agent identity using explicit author name and email
+   git -c user.name="Cursor AI" -c user.email="agent@cursor.tools" commit -m "Task: Description of the specific task just completed"
+   ```
+   
+   > **CRITICAL REMINDERS**:
+   > - YOU MUST make a separate commit for each task
+   > - The commits MUST be tagged with `-c user.name` and `-c user.email` as specified above
+   > - DO NOT combine multiple tasks into a single commit
+
+---
+
+## 4️⃣ Completion and Pull Request
 1. When all tasks are completed:
    - Push your branch to GitHub: 
      ```bash
@@ -130,7 +150,9 @@ Follow these steps in order:
      gh issue edit <issue-number> --add-label "ready-for-review"
      ```
 
-## Cleanup
+---
+
+## 5️⃣ Cleanup
 1. Optional: Remove any temporary files created during the workflow:
    ```bash
    # Remove temporary files if they exist
@@ -141,6 +163,8 @@ Follow these steps in order:
    ```bash
    git checkout master
    ```
+
+---
 
 ## Troubleshooting
 - If `gh issue view` doesn't show the full issue body, try using `--json body` flag to get the complete content
