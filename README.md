@@ -1,11 +1,17 @@
-# Calculator
+# Cursor Issues Calculator
 
-A simple Node.js calculator CLI application that performs arithmetic operations.
+A simple Node.js calculator CLI application that performs arithmetic operations. This repository is used for demonstrating issue management in GitHub.
+
+## Features
+
+- Basic arithmetic operations (addition, subtraction, multiplication, division)
+- Command-line interface
+- Unit tested
 
 ## Installation
 
 ```bash
-git clone git@github.com:Kartones/cursor-issues.git
+git clone git@github.com:robwil/cursor-issues.git
 cd cursor-issues
 npm install
 ```
@@ -38,6 +44,13 @@ Multiply: 5 * 3 = 15
 Divide: 5 / 3 = 1.6666666666666667
 ```
 
+## Available Operations
+
+- `sum`: Adds two numbers together
+- `subtract`: Subtracts the second number from the first 
+- `multiply`: Multiplies two numbers together
+- `divide`: Divides the first number by the second 
+
 ## Testing
 
 Run tests with:
@@ -46,9 +59,14 @@ Run tests with:
 npm test
 ```
 
-## Available Commands
+## Contributing
 
-- `sum`: Adds two numbers together
-- `subtract`: Subtracts the second number from the first 
-- `multiply`: Multiplies two numbers together
-- `divide`: Divides the first number by the second 
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add some amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
+
+## License
+
+This project is licensed under the terms found in the LICENSE file in the root of this repository. 
