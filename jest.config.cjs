@@ -1,24 +1,31 @@
 /** @type {import('jest').Config} */
 const config = {
-  // Use ts-jest for TypeScript files
-  preset: 'ts-jest',
-  
-  // Test environment
-  testEnvironment: 'node',
-  
-  // File extensions to consider as test files
-  testMatch: ['**/*.test.ts'],
-  
-  // Directories to exclude from testing
-  testPathIgnorePatterns: ['/node_modules/', '/dist/'],
-  
-  // Display verbose output
+  // Common options
   verbose: true,
   
-  // Transform TypeScript files
-  transform: {
-    '^.+\\.ts$': 'ts-jest'
-  }
+  // Use Jest projects to organize test types
+  projects: [
+    {
+      displayName: 'unit',
+      preset: 'ts-jest',
+      testEnvironment: 'node',
+      testMatch: ['**/*.test.ts'],
+      testPathIgnorePatterns: ['/node_modules/', '/dist/', '.*\\.integration\\.test\\.ts$'],
+      transform: {
+        '^.+\\.ts$': 'ts-jest'
+      }
+    },
+    {
+      displayName: 'integration',
+      preset: 'ts-jest',
+      testEnvironment: 'node',
+      testMatch: ['**/*.integration.test.ts'],
+      testPathIgnorePatterns: ['/node_modules/', '/dist/'],
+      transform: {
+        '^.+\\.ts$': 'ts-jest'
+      }
+    }
+  ]
 };
 
 module.exports = config; 
