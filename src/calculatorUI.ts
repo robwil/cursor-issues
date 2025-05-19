@@ -33,7 +33,8 @@ export function startCalculatorUI(): void {
   // Create screen
   const screen = blessed.screen({
     smartCSR: true,
-    title: 'Terminal Calculator'
+    title: 'Terminal Calculator',
+    debug: true
   });
 
   // Help user exit
@@ -49,6 +50,7 @@ export function startCalculatorUI(): void {
   let firstOperand: number | null = null;
   let waitingForSecondOperand = false;
   let operator: string | null = null;
+  let statusText = 'Ready';
 
   // Main container
   const container = blessed.box({
@@ -98,9 +100,22 @@ export function startCalculatorUI(): void {
     }
   });
 
+  // Status line
+  const status = blessed.text({
+    top: 5,
+    right: 1,
+    width: 38,
+    content: statusText,
+    align: 'right',
+    style: {
+      fg: 'yellow'
+    }
+  });
+
   // Update the display
   const updateDisplay = () => {
     display.setContent(displayValue);
+    status.setContent(statusText);
     screen.render();
   };
 
@@ -109,10 +124,25 @@ export function startCalculatorUI(): void {
     if (waitingForSecondOperand) {
       displayValue = digit;
       waitingForSecondOperand = false;
+      statusText = `${firstOperand} ${getSymbol(operator)} ...`;
     } else {
       displayValue = displayValue === '0' ? digit : displayValue + digit;
+      statusText = 'Entering number...';
     }
     updateDisplay();
+  };
+
+  // Get symbol for operator
+  const getSymbol = (op: string | null): string => {
+    if (!op) return '';
+    switch (op) {
+      case '+': return '+';
+      case '-': return '-';
+      case '*': return '×';
+      case '/': return '÷';
+      case '^': return '^';
+      default: return op;
+    }
   };
 
   // Process operation
@@ -129,6 +159,7 @@ export function startCalculatorUI(): void {
     
     waitingForSecondOperand = true;
     operator = nextOperator;
+    statusText = `${firstOperand} ${getSymbol(operator)}`;
     updateDisplay();
   };
 
@@ -139,42 +170,54 @@ export function startCalculatorUI(): void {
     const secondOperand = parseFloat(displayValue);
     let result = 0;
     
-    switch (op) {
-      case '+':
-        result = sum(firstOperand, secondOperand);
-        break;
-      case '-':
-        result = subtract(firstOperand, secondOperand);
-        break;
-      case '*':
-        result = multiply(firstOperand, secondOperand);
-        break;
-      case '/':
-        try {
+    try {
+      switch (op) {
+        case '+':
+          result = sum(firstOperand, secondOperand);
+          break;
+        case '-':
+          result = subtract(firstOperand, secondOperand);
+          break;
+        case '*':
+          result = multiply(firstOperand, secondOperand);
+          break;
+        case '/':
           result = divide(firstOperand, secondOperand);
-        } catch (e) {
-          displayValue = 'Error';
-          firstOperand = null;
-          waitingForSecondOperand = false;
-          operator = null;
-          updateDisplay();
-          return 0;
-        }
-        break;
-      case '^':
-        result = power(firstOperand, secondOperand);
-        break;
+          break;
+        case '^':
+          result = power(firstOperand, secondOperand);
+          break;
+      }
+      
+      statusText = `${firstOperand} ${getSymbol(op)} ${secondOperand} = ${result}`;
+      return result;
+    } catch (e) {
+      displayValue = 'Error';
+      if (e instanceof Error) {
+        statusText = e.message;
+      } else {
+        statusText = 'Error in calculation';
+      }
+      firstOperand = null;
+      waitingForSecondOperand = false;
+      operator = null;
+      updateDisplay();
+      return 0;
     }
-    
-    return result;
   };
 
   // Handle equals button
   const handleEquals = () => {
-    if (!operator || firstOperand === null) return;
+    if (!operator || firstOperand === null) {
+      statusText = 'No operation to perform';
+      updateDisplay();
+      return;
+    }
     
+    const secondOperand = parseFloat(displayValue);
     const result = performCalculation(operator);
     displayValue = String(result);
+    statusText = `${firstOperand} ${getSymbol(operator)} ${secondOperand} = ${result}`;
     firstOperand = null;
     waitingForSecondOperand = false;
     operator = null;
@@ -187,26 +230,32 @@ export function startCalculatorUI(): void {
     firstOperand = null;
     waitingForSecondOperand = false;
     operator = null;
+    statusText = 'Cleared';
     updateDisplay();
   };
 
   // Memory functions
   const memoryStore = () => {
     memory.store(parseFloat(displayValue));
+    statusText = `Stored ${displayValue} in memory`;
+    updateDisplay();
   };
 
   const memoryRecall = () => {
     displayValue = String(memory.recall());
+    statusText = `Recalled ${displayValue} from memory`;
     updateDisplay();
   };
 
   const memoryClear = () => {
     memory.clear();
+    statusText = `Memory cleared`;
+    updateDisplay();
   };
 
-  // Create calculator buttons
+  // Create calculator buttons using regular boxes instead of buttons
   const createButton = (label: string, top: number, left: number, width: number, height: number, callback: () => void, color: string = 'white', bg: string = 'blue') => {
-    const button = blessed.button({
+    const button = blessed.box({
       top,
       left,
       width,
@@ -214,6 +263,7 @@ export function startCalculatorUI(): void {
       content: label,
       align: 'center',
       valign: 'middle',
+      tags: true,
       border: {
         type: 'line'
       },
@@ -223,29 +273,52 @@ export function startCalculatorUI(): void {
         border: {
           fg: color
         },
-        focus: {
-          bg: 'green'
-        },
         hover: {
           bg: 'green'
         }
-      }
+      },
+      clickable: true,
+      mouse: true
     });
     
-    button.on('press', callback);
+    // Handle mouse events
+    button.on('click', () => {
+      callback();
+      screen.render(); // Force render after click
+    });
+    
     container.append(button);
     return button;
   };
 
+  // Add keyboard support for number keys, operations, and equals
+  screen.key(['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'], (ch, key) => {
+    inputDigit(key.name);
+  });
+  
+  screen.key(['+'], () => handleOperator('+'));
+  screen.key(['-'], () => handleOperator('-'));
+  screen.key(['*'], () => handleOperator('*'));
+  screen.key(['/'], () => handleOperator('/'));
+  screen.key(['^'], () => handleOperator('^'));
+  screen.key(['=', 'return'], () => handleEquals());
+  screen.key(['c'], () => clearCalculator());
+  screen.key(['m'], () => memoryStore());
+  screen.key(['r'], () => memoryRecall());
+  screen.key(['x'], () => memoryClear());
+
   // Number buttons
   const buttonWidth = 8;
   const buttonHeight = 3;
-  let row = 6;
+  let row = 7;
   let col = 1;
 
   // Numbers 1-9
   for (let i = 1; i <= 9; i++) {
-    createButton(String(i), row, col, buttonWidth, buttonHeight, () => inputDigit(String(i)));
+    const digit = String(i);
+    createButton(digit, row, col, buttonWidth, buttonHeight, () => {
+      inputDigit(digit);
+    });
     col += buttonWidth + 1;
     if (i % 3 === 0) {
       row += buttonHeight + 1;
@@ -254,7 +327,9 @@ export function startCalculatorUI(): void {
   }
 
   // Zero button
-  createButton('0', row, col, buttonWidth, buttonHeight, () => inputDigit('0'));
+  createButton('0', row, col, buttonWidth, buttonHeight, () => {
+    inputDigit('0');
+  });
 
   // Decimal button
   createButton('.', row, col + buttonWidth + 1, buttonWidth, buttonHeight, () => {
@@ -265,38 +340,84 @@ export function startCalculatorUI(): void {
   });
 
   // Operation buttons
-  row = 6;
+  row = 7;
   col = 28;
   
-  createButton('+', row, col, buttonWidth, buttonHeight, () => handleOperator('+'), 'white', 'red');
-  createButton('-', row + buttonHeight + 1, col, buttonWidth, buttonHeight, () => handleOperator('-'), 'white', 'red');
-  createButton('×', row + (buttonHeight + 1) * 2, col, buttonWidth, buttonHeight, () => handleOperator('*'), 'white', 'red');
-  createButton('÷', row + (buttonHeight + 1) * 3, col, buttonWidth, buttonHeight, () => handleOperator('/'), 'white', 'red');
+  createButton('+', row, col, buttonWidth, buttonHeight, () => {
+    handleOperator('+');
+  }, 'white', 'red');
+  
+  createButton('-', row + buttonHeight + 1, col, buttonWidth, buttonHeight, () => {
+    handleOperator('-');
+  }, 'white', 'red');
+  
+  createButton('×', row + (buttonHeight + 1) * 2, col, buttonWidth, buttonHeight, () => {
+    handleOperator('*');
+  }, 'white', 'red');
+  
+  createButton('÷', row + (buttonHeight + 1) * 3, col, buttonWidth, buttonHeight, () => {
+    handleOperator('/');
+  }, 'white', 'red');
   
   // Power button
-  createButton('^', row + (buttonHeight + 1) * 4, 1, buttonWidth, buttonHeight, () => handleOperator('^'), 'white', 'magenta');
+  createButton('^', row + (buttonHeight + 1) * 4, 1, buttonWidth, buttonHeight, () => {
+    handleOperator('^');
+  }, 'white', 'magenta');
   
-  // Equals button
-  createButton('=', row + (buttonHeight + 1) * 4, col, buttonWidth, buttonHeight, handleEquals, 'white', 'green');
+  // Equals button - highlight this with a different style
+  createButton('=', row + (buttonHeight + 1) * 4, col, buttonWidth, buttonHeight, () => {
+    handleEquals();
+  }, 'black', 'green');
   
   // Clear button
-  createButton('C', row + (buttonHeight + 1) * 4, 1 + buttonWidth + 1, buttonWidth, buttonHeight, clearCalculator, 'black', 'yellow');
+  createButton('C', row + (buttonHeight + 1) * 4, 1 + buttonWidth + 1, buttonWidth, buttonHeight, () => {
+    clearCalculator();
+  }, 'black', 'yellow');
   
   // Memory buttons
-  createButton('M+', row + (buttonHeight + 1) * 4, 1 + (buttonWidth + 1) * 2, buttonWidth, buttonHeight, memoryStore, 'white', 'cyan');
-  createButton('MR', row + (buttonHeight + 1) * 4, 1 + (buttonWidth + 1) * 3, buttonWidth, buttonHeight, memoryRecall, 'white', 'cyan');
-  createButton('MC', row + (buttonHeight + 1) * 4 - buttonHeight - 1, 1 + (buttonWidth + 1) * 3, buttonWidth, buttonHeight, memoryClear, 'white', 'cyan');
+  createButton('M+', row + (buttonHeight + 1) * 4, 1 + (buttonWidth + 1) * 2, buttonWidth, buttonHeight, () => {
+    memoryStore();
+  }, 'white', 'cyan');
+  
+  createButton('MR', row + (buttonHeight + 1) * 4, 1 + (buttonWidth + 1) * 3, buttonWidth, buttonHeight, () => {
+    memoryRecall();
+  }, 'white', 'cyan');
+  
+  createButton('MC', row + (buttonHeight + 1) * 4 - buttonHeight - 1, 1 + (buttonWidth + 1) * 3, buttonWidth, buttonHeight, () => {
+    memoryClear();
+  }, 'white', 'cyan');
 
   // Add components to screen
   container.append(title);
   container.append(display);
+  container.append(status);
   screen.append(container);
+
+  // Add instruction text
+  const instructions = blessed.text({
+    bottom: 0,
+    left: 'center',
+    content: 'Mouse: Click buttons | Keyboard: Numbers, +, -, *, /, ^, =, Enter, c, m, r, x | ESC/q to exit',
+    style: {
+      fg: 'white',
+    }
+  });
+  
+  container.append(instructions);
+
+  // Enable mouse support
+  screen.enableMouse();
 
   // Focus on container
   container.focus();
 
   // Render the screen
   screen.render();
+  
+  // Periodically re-render to ensure display updates are visible
+  setInterval(() => {
+    screen.render();
+  }, 100);
 }
 
 // If this file is run directly
