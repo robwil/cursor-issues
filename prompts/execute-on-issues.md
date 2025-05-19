@@ -1,5 +1,7 @@
 # GitHub Issue Processing Workflow
 
+This workflow is intended to find existing Github issues containing instructions for code tasks, and then execute those code tasks. The description below describes critical requirements and exact steps to follow.
+
 > ## ⚠️ CRITICAL WORKFLOW REQUIREMENTS ⚠️
 > 
 > 1. **COMMIT EACH TASK INDIVIDUALLY** - Do not combine multiple tasks in one commit
@@ -9,6 +11,7 @@
 >    ```
 > 3. **UPDATE ISSUE AFTER EACH TASK** - Mark each task complete in the issue before moving to the next
 > 4. **FOLLOW THE EXACT SEQUENCE** - Do not skip any steps in this workflow
+> 5. **STOP IF THERE ARE NO ISSUES** - Do not attempt to create new Github issues. Only work on ones that have already been created separately from this workflow.
 
 ---
 
@@ -58,7 +61,12 @@ Follow these steps in order:
      ```bash
      gh issue edit <issue-number> --add-label "WIP"
      ```
-   - If there are no eligible open issues, **STOP HERE**
+   - If there are no eligible open issues, **STOP HERE** ⛔️ 
+   DO NOT PROCEED FURTHER. DO NOT CREATE NEW ISSUES. EXIT THE WORKFLOW.
+
+# MANUAL CHECK REQUIRED:
+# Have you found an eligible issue? YES ▢ NO ▢
+# If NO, STOP NOW. DO NOT CONTINUE.
 
 ---
 
