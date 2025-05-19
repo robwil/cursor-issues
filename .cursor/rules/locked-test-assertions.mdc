@@ -1,0 +1,89 @@
+---
+description:
+globs:
+alwaysApply: false
+---
+# Locked Test Assertions
+
+Rule to prevent modifying test assertions unless the corresponding source code has been modified first.
+
+<rule>
+name: locked_test_assertions
+description: Ensures test assertions are only modified after relevant source code changes
+filters:
+  # Match test files
+  - type: file_extension
+    pattern: "\\.test\\.(ts|js|tsx|jsx)$"
+  # Match file edits
+  - type: event
+    pattern: "file_edit"
+
+actions:
+  - type: warn
+    conditions:
+      # Detect changes to expect() assertions
+      - pattern: "(?s)diff\\s+.*?[+-]\\s*expect\\("
+        message: "Modifying test assertions without first changing the implementation may lead to regressions"
+
+  - type: suggest
+    message: |
+      Test assertions should only be modified when:
+
+      1. The corresponding implementation has changed first:
+         - First commit the implementation changes
+         - Then update the tests in a separate commit
+         - Include clear explanation for why the test behavior needs to change
+
+      2. For fixing incorrect tests:
+         - Document why the original test was incorrect
+         - Explain how the new test correctly validates the expected behavior
+         - Ensure the implementation still meets requirements
+
+      3. Test modification workflow:
+         ```
+         1. Identify need for code change
+         2. Modify implementation code
+         3. Run tests and verify failures
+         4. Update tests to match new expected behavior
+         5. Document why the behavior & test changed
+         ```
+
+      Remember: Tests are specifications of expected behavior. Changing tests without changing implementation suggests changing the specification, which requires careful consideration.
+
+examples:
+  - input: |
+      # Bad: Changing test without implementation changes
+      
+      // Original test
+      test('multiplies two numbers', () => {
+        expect(multiply(2, 3)).toBe(6);
+      });
+      
+      // Changed test without implementation change
+      test('multiplies two numbers', () => {
+        expect(multiply(2, 3)).toBe(7); // Wrong change
+      });
+      
+      # Good: Implementation changed first, then test
+      
+      // Step 1: Update implementation
+      // src/commands/multiply.ts
+      export function multiply(a: number, b: number): number {
+        // Fixed implementation to handle special case
+        if (a === 2 && b === 3) return 7; // Special business case
+        return a * b;
+      }
+      
+      // Step 2: Update test to match new behavior
+      test('multiplies two numbers', () => {
+        // Regular case
+        expect(multiply(3, 4)).toBe(12);
+        // Special case documented
+        expect(multiply(2, 3)).toBe(7); // Special business requirement
+      });
+    output: "Properly documented test changes with implementation changes"
+
+metadata:
+  priority: high
+  version: 1.0
+</rule>
