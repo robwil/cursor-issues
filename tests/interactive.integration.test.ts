@@ -5,108 +5,149 @@ import { setTimeout } from 'timers';
 
 const sleep = promisify(setTimeout);
 
-describe('Interactive Calculator CLI', () => {
-  const scriptPath = join(__dirname, '..', 'src', 'calculator.ts');
+// Helper function to create a controlled CLI test process
+function createCliTest() {
+  const cliPath = join(__dirname, '..', 'src', 'calculator.ts');
+  const process = spawn('ts-node', [cliPath], { 
+    stdio: ['pipe', 'pipe', 'pipe']
+  });
   
+  let stdoutData = '';
+  let stderrData = '';
+  
+  process.stdout.on('data', (data) => {
+    stdoutData += data.toString();
+  });
+  
+  process.stderr.on('data', (data) => {
+    stderrData += data.toString();
+  });
+  
+  return {
+    process,
+    getStdout: () => stdoutData,
+    getStderr: () => stderrData,
+    write: (input: string) => {
+      process.stdin.write(input);
+    },
+    waitForOutput: async (predicate: (output: string) => boolean, timeout = 1000) => {
+      const startTime = Date.now();
+      while (Date.now() - startTime < timeout) {
+        if (predicate(stdoutData)) {
+          return true;
+        }
+        await sleep(50);
+      }
+      return false;
+    },
+    cleanup: () => {
+      process.kill();
+    }
+  };
+}
+
+describe('Interactive Calculator CLI', () => {
   test('should start in interactive mode when no arguments are provided', async () => {
-    // Start the calculator process
-    const process = spawn('ts-node', [scriptPath]);
+    const cliTest = createCliTest();
     
-    let output = '';
+    // Wait for the welcome message
+    await cliTest.waitForOutput((stdout) => 
+      stdout.includes('Welcome to the Interactive Calculator')
+    );
     
-    // Collect stdout
-    process.stdout.on('data', (data) => {
-      output += data.toString();
-    });
+    // Exit the program
+    cliTest.write('9\n');
     
-    // Wait for the welcome message and menu to appear (increased wait time)
-    await sleep(1000);
+    // Wait a bit more for processing
+    await sleep(500);
+    
+    // Get the collected output
+    const stdout = cliTest.getStdout();
     
     // Verify welcome message and menu are displayed
-    expect(output).toContain('Welcome to the Interactive Calculator');
-    expect(output).toContain('Choose operation:');
-    expect(output).toContain('1. Add');
-    expect(output).toContain('9. Exit');
+    expect(stdout).toContain('Welcome to the Interactive Calculator');
+    expect(stdout).toContain('Choose operation:');
+    expect(stdout).toContain('1. Add');
+    expect(stdout).toContain('9. Exit');
     
     // Clean up
-    process.kill();
+    cliTest.cleanup();
   }, 5000);
   
   test('should perform addition in interactive mode', async () => {
-    // Start the calculator process
-    const process = spawn('ts-node', [scriptPath]);
+    const cliTest = createCliTest();
     
-    let output = '';
+    // Wait for the welcome message
+    await cliTest.waitForOutput((stdout) => 
+      stdout.includes('Choose operation:')
+    );
     
-    // Collect stdout
-    process.stdout.on('data', (data) => {
-      output += data.toString();
-    });
+    // Select addition operation
+    cliTest.write('1\n');
     
-    // Wait for the welcome message and menu to appear
+    // Wait for the first number prompt
+    await cliTest.waitForOutput((stdout) => 
+      stdout.includes('Enter two numbers')
+    );
+    
+    // Enter first number
+    cliTest.write('4\n');
+    
+    // Enter second number
+    cliTest.write('6\n');
+    
+    // Wait for the result
+    await cliTest.waitForOutput((stdout) => 
+      stdout.includes('Result: 10')
+    );
+    
+    // Exit the program
+    cliTest.write('9\n');
+    
+    // Wait a bit more for processing
     await sleep(500);
-    
-    // Select addition (1)
-    process.stdin.write('1\n');
-    
-    // Wait for number prompt
-    await sleep(200);
-    
-    // Input first number (4)
-    process.stdin.write('4\n');
-    
-    // Wait for second number prompt
-    await sleep(200);
-    
-    // Input second number (6)
-    process.stdin.write('6\n');
-    
-    // Wait for result
-    await sleep(200);
     
     // Verify the addition result
-    expect(output).toContain('Result: 10');
-    
-    // Close the program by selecting exit (9)
-    process.stdin.write('9\n');
+    expect(cliTest.getStdout()).toContain('Result: 10');
     
     // Clean up
-    process.kill();
-  }, 10000);
+    cliTest.cleanup();
+  }, 5000);
   
   test('should handle invalid input', async () => {
-    // Start the calculator process
-    const process = spawn('ts-node', [scriptPath]);
+    const cliTest = createCliTest();
     
-    let output = '';
+    // Wait for the welcome message
+    await cliTest.waitForOutput((stdout) => 
+      stdout.includes('Choose operation:')
+    );
     
-    // Collect stdout
-    process.stdout.on('data', (data) => {
-      output += data.toString();
-    });
+    // Select addition operation
+    cliTest.write('1\n');
     
-    // Wait for the welcome message and menu to appear
+    // Wait for the number prompt
+    await cliTest.waitForOutput((stdout) => 
+      stdout.includes('Enter two numbers')
+    );
+    
+    // Enter invalid input
+    cliTest.write('abc\n');
+    
+    // Wait for the error message
+    await cliTest.waitForOutput((stdout) => 
+      stdout.includes('Invalid number')
+    );
+    
+    // Exit the program
+    cliTest.write('9\n');
+    
+    // Wait a bit more for processing
     await sleep(500);
     
-    // Select addition (1)
-    process.stdin.write('1\n');
-    
-    // Wait for number prompt
-    await sleep(200);
-    
-    // Input invalid first number
-    process.stdin.write('abc\n');
-    
-    // Wait for result
-    await sleep(200);
-    
     // Verify error message for invalid input
-    expect(output).toContain('Invalid number');
-    
-    // Close the program by selecting exit (9)
-    process.stdin.write('9\n');
+    expect(cliTest.getStdout()).toContain('Invalid number');
     
     // Clean up
-    process.kill();
-  }, 10000);
+    cliTest.cleanup();
+  }, 5000);
 }); 
