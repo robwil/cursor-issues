@@ -1,0 +1,89 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+# TypeScript and pnpm Standards
+
+Rule to ensure consistent use of TypeScript and pnpm across the repository.
+
+<rule>
+name: typescript_pnpm_standards
+description: Enforces TypeScript usage and pnpm as the package manager
+filters:
+  # Match file creation events
+  - type: event
+    pattern: "file_create"
+  # Match package manager commands
+  - type: event
+    pattern: "package_manager_command"
+  # Match test and script executions
+  - type: event
+    pattern: "test_execution|script_execution"
+
+actions:
+  - type: reject
+    conditions:
+      # Reject new JavaScript files
+      - pattern: "\\.(js|jsx)$"
+        message: "New files must use TypeScript (.ts or .tsx extension)"
+      
+      # Reject npm/yarn commands
+      - pattern: "^(npm|yarn) "
+        message: "Use pnpm instead of npm or yarn for package management"
+      
+      # Reject non-pnpm test/script executions
+      - pattern: "^(npm|yarn) (run|test|start|dev)"
+        message: "Use pnpm for running tests and scripts"
+
+  - type: suggest
+    message: |
+      Follow these standards:
+
+      1. Use TypeScript for all new code:
+         - Use `.ts` extension for regular TypeScript files
+         - Use `.tsx` extension for React components
+         - Convert existing `.js` files to `.ts` when modifying
+
+      2. Use pnpm for package management:
+         ```bash
+         # Installing dependencies
+         pnpm install <package-name>
+
+         # Running scripts
+         pnpm run <script-name>
+
+         # Running tests
+         pnpm test
+
+         # Development server
+         pnpm dev
+         ```
+
+examples:
+  - input: |
+      # Bad: JavaScript file
+      src/components/Button.js
+      src/utils/helper.js
+
+      # Bad: npm/yarn commands
+      npm install lodash
+      yarn add react
+      npm run test
+      yarn dev
+
+      # Good: TypeScript files
+      src/components/Button.tsx
+      src/utils/helper.ts
+
+      # Good: pnpm commands
+      pnpm add lodash
+      pnpm add react
+      pnpm test
+      pnpm dev
+    output: "Correctly using TypeScript and pnpm"
+
+metadata:
+  priority: high
+  version: 1.0
+</rule>

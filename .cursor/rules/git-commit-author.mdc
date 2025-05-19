@@ -1,0 +1,76 @@
+---
+description: Git Commit Author configuration for agent commits
+globs: 
+alwaysApply: false
+---
+# Git Commit Author Configuration
+
+Rule to ensure consistent Git commit author information for AI agent commits.
+
+<rule>
+name: git_commit_author
+description: Enforces correct Git commit author configuration for AI agent commits
+filters:
+  # Match Git commit events and commands
+  - type: event
+    pattern: "git_commit|git_command"
+  # Match GitHub Tool usage
+  - type: tool
+    pattern: "github"
+
+actions:
+  - type: reject
+    conditions:
+      # Reject git commit commands without explicit author info
+      - pattern: "git commit(?!.*--author=)"
+        message: "Git commit commands must explicitly specify the author using --author flag"
+      
+      # Reject incorrect author format
+      - pattern: "git commit.*--author=(?!\"AI Agent <ai-agent@cursor\\.tools>\")"
+        message: "Git commit author must be specified as 'AI Agent <ai-agent@cursor.tools>'"
+
+      # Reject GitHub Tool commits without proper author
+      - pattern: "github.*commit(?!.*author)"
+        message: "GitHub Tool commits must specify the author parameter"
+
+  - type: suggest
+    message: |
+      For AI agent commits, always use explicit author information:
+
+      ```bash
+      # Using git command
+      git commit -m "commit message" --author="AI Agent <ai-agent@cursor.tools>"
+
+      # Using GitHub Tool
+      github.commit({
+        message: "commit message",
+        author: {
+          name: "AI Agent",
+          email: "ai-agent@cursor.tools"
+        }
+      })
+      ```
+
+      This ensures consistent attribution for AI-generated commits.
+
+examples:
+  - input: |
+      # Bad: Missing explicit author
+      git commit -m "Update README"
+      git commit --author="Wrong Name <wrong@email.com>"
+
+      # Good: Correct author specification
+      git commit -m "Update README" --author="AI Agent <ai-agent@cursor.tools>"
+      github.commit({
+        message: "Update README",
+        author: {
+          name: "AI Agent",
+          email: "ai-agent@cursor.tools"
+        }
+      })
+    output: "Correctly specified Git commit author information"
+
+metadata:
+  priority: high
+  version: 1.2
+</rule>
