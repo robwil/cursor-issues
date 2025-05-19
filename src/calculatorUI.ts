@@ -367,6 +367,12 @@ export function startCalculatorUI(): void {
     updateDisplay();
   };
 
+  // Log function for debugging
+  const logToStatus = (msg: string) => {
+    statusText = msg;
+    updateDisplay();
+  };
+
   // Create calculator buttons using regular boxes instead of buttons
   const createButton = (label: string, top: number, left: number, width: number, height: number, callback: () => void, color: string = 'white', bg: string = 'blue') => {
     const button = blessed.box({
@@ -552,9 +558,9 @@ export function startCalculatorUI(): void {
   createButton('^', row + (buttonHeight + 1) * 4, 1, buttonWidth, buttonHeight, () => {
     handleOperator('^');
   }, 'white', 'magenta');
-  
-  // Equals button - highlight this with a different style
-  createButton('=', row + (buttonHeight + 1) * 4, col, buttonWidth, buttonHeight, () => {
+
+  // Equals button - highlight this with a different style and make it larger
+  createButton('=', row, col + buttonWidth + 1, buttonWidth, buttonHeight, () => {
     handleEquals();
   }, 'black', 'green');
   
