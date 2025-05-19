@@ -1,0 +1,99 @@
+---
+description:
+globs:
+alwaysApply: false
+---
+# CommonJS Compatibility
+
+Rule to ensure consistent use of CommonJS-compatible dependencies and avoid ESM module issues.
+
+<rule>
+name: commonjs_compatibility
+description: Enforces use of CommonJS-compatible packages and prevents ESM-only dependencies
+filters:
+  # Match file creation or modification events
+  - type: event
+    pattern: "file_create|file_update"
+  # Match package manager commands
+  - type: event
+    pattern: "package_manager_command"
+
+actions:
+  - type: reject
+    conditions:
+      # Reject type="module" in package.json
+      - pattern: "\"type\":\\s*\"module\""
+        message: "This project uses CommonJS. Do not add \"type\": \"module\" to package.json."
+      
+      # Reject import syntax without .js extension (ESM style)
+      - pattern: "import\\s+.*\\s+from\\s+['\"](?!.*\\.js)[^'\"]*['\"]"
+        message: "Use CommonJS require() instead of ES Modules import, or add .js extension for compatibility."
+      
+      # Reject installing ESM-only packages
+      - pattern: "pnpm add (cli-testing-library|execa@6|chalk@5|inquirer@9)"
+        message: "This package version is ESM-only. Use a CommonJS-compatible version instead."
+
+  - type: suggest
+    message: |
+      Follow these CommonJS compatibility guidelines:
+
+      1. Prefer CommonJS syntax over ES Modules:
+         ```javascript
+         // Prefer this:
+         const { something } = require('package');
+         
+         // Over this:
+         import { something } from 'package';
+         ```
+
+      2. Use CommonJS-compatible package versions:
+         - chalk@4.x (not chalk@5+)
+         - inquirer@8.x (not inquirer@9+)
+         - execa@5.x (not execa@6+)
+         - No cli-testing-library (ESM-only)
+
+      3. When you must use ESM-compatible packages:
+         - Add "cjs" to the package name if available (package-name-cjs)
+         - Use specific versions that maintained CommonJS compatibility
+         - Consider dynamic imports for specific modules:
+           ```javascript
+           const { someFunction } = await import('esm-package');
+           ```
+
+      4. For testing CLI applications, use Node.js built-in modules:
+         - child_process (spawn, exec)
+         - util.promisify for async handling
+         - path for path manipulation
+
+examples:
+  - input: |
+      // Bad: ESM-style imports
+      import chalk from 'chalk';
+      import inquirer from 'inquirer';
+      
+      // Bad: ESM-only package installation
+      pnpm add chalk@5 inquirer@9 cli-testing-library
+      
+      // Bad: package.json with "type": "module"
+      {
+        "name": "my-project",
+        "type": "module"
+      }
+      
+      // Good: CommonJS requires
+      const chalk = require('chalk');
+      const inquirer = require('inquirer');
+      
+      // Good: CommonJS-compatible versions
+      pnpm add chalk@4 inquirer@8
+      
+      // Good: package.json without "type": "module"
+      {
+        "name": "my-project"
+      }
+    output: "Using correct CommonJS syntax and versions"
+
+metadata:
+  priority: high
+  version: 1.0
+</rule>
