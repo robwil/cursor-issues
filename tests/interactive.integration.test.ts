@@ -58,9 +58,6 @@ describe('Interactive Calculator CLI', () => {
     // Exit the program
     cliTest.write('9\n');
     
-    // Wait a bit more for processing
-    await sleep(500);
-    
     // Get the collected output
     const stdout = cliTest.getStdout();
     
@@ -104,9 +101,6 @@ describe('Interactive Calculator CLI', () => {
     // Exit the program
     cliTest.write('9\n');
     
-    // Wait a bit more for processing
-    await sleep(500);
-    
     // Verify the addition result
     expect(cliTest.getStdout()).toContain('Result: 10');
     
@@ -140,9 +134,6 @@ describe('Interactive Calculator CLI', () => {
     
     // Exit the program
     cliTest.write('9\n');
-    
-    // Wait a bit more for processing
-    await sleep(500);
     
     // Verify error message for invalid input
     expect(cliTest.getStdout()).toContain('Invalid number');
