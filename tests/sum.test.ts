@@ -1,4 +1,4 @@
-import { sum } from "../src/commands/sum.mjs";
+import { sum } from "../src/commands/sum";
 
 describe('sum function', () => {
   console.log("Testing sum command...");
@@ -22,4 +22,4 @@ describe('sum function', () => {
   afterAll(() => {
     console.log("All sum tests passed!");
   });
-});
+}); 

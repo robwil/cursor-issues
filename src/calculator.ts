@@ -1,21 +1,21 @@
 #!/usr/bin/env node
 
-import { sum } from "./commands/sum.mjs";
-import { subtract } from "./commands/subtract.mjs";
-import { multiply } from "./commands/multiply.mjs";
-import { divide } from "./commands/divide.mjs";
+import { sum } from "./commands/sum";
+import { subtract } from "./commands/subtract";
+import { multiply } from "./commands/multiply";
+import { divide } from "./commands/divide";
 
 /**
  * Main calculator function that processes command line arguments
  * and outputs the results of sum and subtract operations
  */
-function main() {
+function main(): void {
   // Get command line arguments (skip the first two which are node and script path)
   const args = process.argv.slice(2);
 
   // Check if we have exactly two arguments
   if (args.length !== 2) {
-    console.error("Usage: node calculator.mjs <number1> <number2>");
+    console.error("Usage: node calculator.js <number1> <number2>");
     process.exit(1);
   }
 
@@ -38,9 +38,13 @@ function main() {
   try {
     console.log(`Divide: ${num1} / ${num2} = ${divide(num1, num2)}`);
   } catch (error) {
-    console.error(`Division Error: ${error.message}`);
+    if (error instanceof Error) {
+      console.error(`Division Error: ${error.message}`);
+    } else {
+      console.error('An unknown error occurred during division');
+    }
   }
 }
 
 // Run the main function
-main();
+main(); 
