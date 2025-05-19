@@ -5,6 +5,7 @@ import { subtract } from "./commands/subtract";
 import { multiply } from "./commands/multiply";
 import { divide } from "./commands/divide";
 import { power } from "./commands/power";
+import { startInteractiveMode } from "./interactiveMode";
 
 /**
  * Main calculator function that processes command line arguments
@@ -13,6 +14,12 @@ import { power } from "./commands/power";
 function main(): void {
   // Get command line arguments (skip the first two which are node and script path)
   const args = process.argv.slice(2);
+
+  // If no arguments are provided, start the interactive mode
+  if (args.length === 0) {
+    startInteractiveMode();
+    return;
+  }
 
   // Check if we have exactly two arguments
   if (args.length !== 2) {
