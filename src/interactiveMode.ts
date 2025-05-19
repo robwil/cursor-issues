@@ -5,6 +5,7 @@ import { subtract } from "./commands/subtract";
 import { multiply } from "./commands/multiply";
 import { divide } from "./commands/divide";
 import { power } from "./commands/power";
+import { startCalculatorUI } from "./calculatorUI";
 
 // Define operation type for better type safety
 type Operation = {
@@ -42,6 +43,7 @@ async function showMainMenu(): Promise<void> {
     { name: '✖️ Multiplication', value: 'multiply', function: multiply },
     { name: '➗ Division', value: 'divide', function: divide },
     { name: '🔢 Power', value: 'power', function: power },
+    { name: '🖥️ Switch to GUI Mode', value: 'gui', function: () => 0 },
     { name: '🚪 Exit', value: 'exit', function: () => 0 }
   ];
   
@@ -58,6 +60,12 @@ async function showMainMenu(): Promise<void> {
     
     if (operation.value === 'exit') {
       console.log(chalk.green('\nThank you for using the Interactive Calculator! Goodbye! 👋\n'));
+      return;
+    }
+
+    if (operation.value === 'gui') {
+      console.log(chalk.cyan('\nSwitching to GUI mode...\n'));
+      startCalculatorUI();
       return;
     }
     
