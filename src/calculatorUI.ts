@@ -129,7 +129,7 @@ export function startCalculatorUI(): void {
     top: 'center',
     left: 'center',
     width: 60,
-    height: 14,
+    height: 16,
     content: '',
     align: 'center',
     valign: 'middle',
@@ -146,18 +146,45 @@ export function startCalculatorUI(): void {
     hidden: true
   });
 
+  // Close help button
+  const closeHelpButton = blessed.button({
+    bottom: 1,
+    left: 'center',
+    width: 20,
+    height: 3,
+    content: 'Close Help',
+    align: 'center',
+    valign: 'middle',
+    style: {
+      fg: 'black',
+      bg: 'white',
+      focus: {
+        bg: 'green'
+      },
+      hover: {
+        bg: 'green'
+      }
+    },
+    mouse: true
+  });
+
+  closeHelpButton.on('press', () => {
+    hideHelp();
+  });
+
   // Add help content
   const helpContent = blessed.text({
     top: 0,
     left: 0,
     right: 0,
-    bottom: 0,
+    bottom: 4,
     padding: 1,
     content: [
       '{center}{bold}Calculator Help{/bold}{/center}',
       '',
       '{bold}Keyboard Controls:{/bold}',
       ' - Numbers: 0-9 keys',
+      ' - Decimal: . key',
       ' - Operations: +, -, *, /, ^',
       ' - Equals: = or Enter key',
       ' - Clear: c',
@@ -166,31 +193,37 @@ export function startCalculatorUI(): void {
       ' - Memory clear: x',
       ' - Exit: ESC or q',
       '',
-      '{center}Press any key to close help{/center}'
+      '{center}Click "Close Help" or press ESC to close{/center}'
     ].join('\n'),
     tags: true
   });
 
   helpBox.append(helpContent);
+  helpBox.append(closeHelpButton);
+
+  // Function to show help
+  const showHelp = () => {
+    showingHelp = true;
+    helpBox.show();
+    closeHelpButton.focus();
+    screen.render();
+  };
+
+  // Function to hide help
+  const hideHelp = () => {
+    showingHelp = false;
+    helpBox.hide();
+    container.focus();
+    screen.render();
+  };
 
   // Toggle help display
   const toggleHelp = () => {
-    showingHelp = !showingHelp;
     if (showingHelp) {
-      helpBox.show();
-      // When help is shown, capture all keys to dismiss it
-      screen.lockKeys = true;
-      screen.key(['?', 'escape', 'return', 'space', 'enter'], () => {
-        helpBox.hide();
-        showingHelp = false;
-        screen.lockKeys = false;
-        screen.render();
-        return false; // Don't propagate
-      });
+      hideHelp();
     } else {
-      helpBox.hide();
+      showHelp();
     }
-    screen.render();
   };
 
   // Update the display
@@ -364,6 +397,10 @@ export function startCalculatorUI(): void {
     
     // Handle mouse events
     button.on('click', () => {
+      if (showingHelp && callback !== toggleHelp) {
+        // Ignore other button clicks when help is showing
+        return;
+      }
       callback();
       screen.render(); // Force render after click
     });
@@ -372,74 +409,92 @@ export function startCalculatorUI(): void {
     return button;
   };
 
-  // Add keyboard support for number keys, operations, and equals
-  screen.key(['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'], (ch, key) => {
-    if (showingHelp) return;
-    inputDigit(key.name);
-  });
+  // Set up keyboard handlers
+  const setupKeyHandlers = () => {
+    // Global key handler
+    screen.key('escape', () => {
+      if (showingHelp) {
+        hideHelp();
+        return;
+      }
+      process.exit(0);
+    });
 
-  screen.key('.', () => {
-    if (showingHelp) return;
-    if (!displayValue.includes('.')) {
-      displayValue += '.';
-      updateDisplay();
-    }
-  });
-  
-  screen.key(['+'], () => {
-    if (showingHelp) return;
-    handleOperator('+')
-  });
-  
-  screen.key(['-'], () => {
-    if (showingHelp) return;
-    handleOperator('-')
-  });
-  
-  screen.key(['*'], () => {
-    if (showingHelp) return;
-    handleOperator('*')
-  });
-  
-  screen.key(['/'], () => {
-    if (showingHelp) return;
-    handleOperator('/')
-  });
-  
-  screen.key(['^'], () => {
-    if (showingHelp) return;
-    handleOperator('^')
-  });
-  
-  screen.key(['=', 'return'], () => {
-    if (showingHelp) return;
-    handleEquals()
-  });
-  
-  screen.key(['c'], () => {
-    if (showingHelp) return;
-    clearCalculator()
-  });
-  
-  screen.key(['m'], () => {
-    if (showingHelp) return;
-    memoryStore()
-  });
-  
-  screen.key(['r'], () => {
-    if (showingHelp) return;
-    memoryRecall()
-  });
-  
-  screen.key(['x'], () => {
-    if (showingHelp) return;
-    memoryClear()
-  });
+    // Help key
+    screen.key('?', () => {
+      toggleHelp();
+    });
+    
+    // Calculator key handlers (only active when help is not showing)
+    screen.key(['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'], (ch, key) => {
+      if (showingHelp) return;
+      inputDigit(key.name);
+    });
 
-  // Help key
-  screen.key(['?'], () => {
-    toggleHelp();
-  });
+    screen.key('.', () => {
+      if (showingHelp) return;
+      if (!displayValue.includes('.')) {
+        displayValue += '.';
+        updateDisplay();
+      }
+    });
+    
+    screen.key('+', () => {
+      if (showingHelp) return;
+      handleOperator('+');
+    });
+    
+    screen.key('-', () => {
+      if (showingHelp) return;
+      handleOperator('-');
+    });
+    
+    screen.key('*', () => {
+      if (showingHelp) return;
+      handleOperator('*');
+    });
+    
+    screen.key('/', () => {
+      if (showingHelp) return;
+      handleOperator('/');
+    });
+    
+    screen.key('^', () => {
+      if (showingHelp) return;
+      handleOperator('^');
+    });
+    
+    screen.key(['=', 'return', 'enter'], () => {
+      if (showingHelp) {
+        hideHelp();
+        return;
+      }
+      handleEquals();
+    });
+    
+    screen.key('c', () => {
+      if (showingHelp) return;
+      clearCalculator();
+    });
+    
+    screen.key('m', () => {
+      if (showingHelp) return;
+      memoryStore();
+    });
+    
+    screen.key('r', () => {
+      if (showingHelp) return;
+      memoryRecall();
+    });
+    
+    screen.key('x', () => {
+      if (showingHelp) return;
+      memoryClear();
+    });
+  };
+
+  // Set up all key handlers
+  setupKeyHandlers();
 
   // Number buttons
   const buttonWidth = 8;
