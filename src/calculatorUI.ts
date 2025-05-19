@@ -51,6 +51,7 @@ export function startCalculatorUI(): void {
   let waitingForSecondOperand = false;
   let operator: string | null = null;
   let statusText = 'Ready';
+  let showingHelp = false;
 
   // Main container
   const container = blessed.box({
@@ -111,6 +112,86 @@ export function startCalculatorUI(): void {
       fg: 'yellow'
     }
   });
+
+  // Help indicator
+  const helpIndicator = blessed.text({
+    top: 0,
+    right: 2,
+    content: '? for help',
+    align: 'right',
+    style: {
+      fg: 'gray',
+    }
+  });
+
+  // Help box with instructions
+  const helpBox = blessed.box({
+    top: 'center',
+    left: 'center',
+    width: 60,
+    height: 14,
+    content: '',
+    align: 'center',
+    valign: 'middle',
+    border: {
+      type: 'line'
+    },
+    style: {
+      fg: 'white',
+      bg: 'blue',
+      border: {
+        fg: 'white'
+      }
+    },
+    hidden: true
+  });
+
+  // Add help content
+  const helpContent = blessed.text({
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    padding: 1,
+    content: [
+      '{center}{bold}Calculator Help{/bold}{/center}',
+      '',
+      '{bold}Keyboard Controls:{/bold}',
+      ' - Numbers: 0-9 keys',
+      ' - Operations: +, -, *, /, ^',
+      ' - Equals: = or Enter key',
+      ' - Clear: c',
+      ' - Memory store: m',
+      ' - Memory recall: r',
+      ' - Memory clear: x',
+      ' - Exit: ESC or q',
+      '',
+      '{center}Press any key to close help{/center}'
+    ].join('\n'),
+    tags: true
+  });
+
+  helpBox.append(helpContent);
+
+  // Toggle help display
+  const toggleHelp = () => {
+    showingHelp = !showingHelp;
+    if (showingHelp) {
+      helpBox.show();
+      // When help is shown, capture all keys to dismiss it
+      screen.lockKeys = true;
+      screen.key(['?', 'escape', 'return', 'space', 'enter'], () => {
+        helpBox.hide();
+        showingHelp = false;
+        screen.lockKeys = false;
+        screen.render();
+        return false; // Don't propagate
+      });
+    } else {
+      helpBox.hide();
+    }
+    screen.render();
+  };
 
   // Update the display
   const updateDisplay = () => {
@@ -293,19 +374,72 @@ export function startCalculatorUI(): void {
 
   // Add keyboard support for number keys, operations, and equals
   screen.key(['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'], (ch, key) => {
+    if (showingHelp) return;
     inputDigit(key.name);
   });
+
+  screen.key('.', () => {
+    if (showingHelp) return;
+    if (!displayValue.includes('.')) {
+      displayValue += '.';
+      updateDisplay();
+    }
+  });
   
-  screen.key(['+'], () => handleOperator('+'));
-  screen.key(['-'], () => handleOperator('-'));
-  screen.key(['*'], () => handleOperator('*'));
-  screen.key(['/'], () => handleOperator('/'));
-  screen.key(['^'], () => handleOperator('^'));
-  screen.key(['=', 'return'], () => handleEquals());
-  screen.key(['c'], () => clearCalculator());
-  screen.key(['m'], () => memoryStore());
-  screen.key(['r'], () => memoryRecall());
-  screen.key(['x'], () => memoryClear());
+  screen.key(['+'], () => {
+    if (showingHelp) return;
+    handleOperator('+')
+  });
+  
+  screen.key(['-'], () => {
+    if (showingHelp) return;
+    handleOperator('-')
+  });
+  
+  screen.key(['*'], () => {
+    if (showingHelp) return;
+    handleOperator('*')
+  });
+  
+  screen.key(['/'], () => {
+    if (showingHelp) return;
+    handleOperator('/')
+  });
+  
+  screen.key(['^'], () => {
+    if (showingHelp) return;
+    handleOperator('^')
+  });
+  
+  screen.key(['=', 'return'], () => {
+    if (showingHelp) return;
+    handleEquals()
+  });
+  
+  screen.key(['c'], () => {
+    if (showingHelp) return;
+    clearCalculator()
+  });
+  
+  screen.key(['m'], () => {
+    if (showingHelp) return;
+    memoryStore()
+  });
+  
+  screen.key(['r'], () => {
+    if (showingHelp) return;
+    memoryRecall()
+  });
+  
+  screen.key(['x'], () => {
+    if (showingHelp) return;
+    memoryClear()
+  });
+
+  // Help key
+  screen.key(['?'], () => {
+    toggleHelp();
+  });
 
   // Number buttons
   const buttonWidth = 8;
@@ -387,23 +521,18 @@ export function startCalculatorUI(): void {
     memoryClear();
   }, 'white', 'cyan');
 
+  // Help button
+  createButton('?', 0, 1, 3, 3, () => {
+    toggleHelp();
+  }, 'white', 'blue');
+
   // Add components to screen
   container.append(title);
   container.append(display);
   container.append(status);
+  container.append(helpIndicator);
   screen.append(container);
-
-  // Add instruction text
-  const instructions = blessed.text({
-    bottom: 0,
-    left: 'center',
-    content: 'Mouse: Click buttons | Keyboard: Numbers, +, -, *, /, ^, =, Enter, c, m, r, x | ESC/q to exit',
-    style: {
-      fg: 'white',
-    }
-  });
-  
-  container.append(instructions);
+  screen.append(helpBox);
 
   // Enable mouse support
   screen.enableMouse();
