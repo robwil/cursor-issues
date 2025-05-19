@@ -6,6 +6,7 @@ import { multiply } from "./commands/multiply";
 import { divide } from "./commands/divide";
 import { power } from "./commands/power";
 import { startInteractiveMode } from "./interactiveMode";
+import { startCalculatorUI } from "./calculatorUI";
 
 /**
  * Main calculator function that processes command line arguments
@@ -14,6 +15,12 @@ import { startInteractiveMode } from "./interactiveMode";
 function main(): void {
   // Get command line arguments (skip the first two which are node and script path)
   const args = process.argv.slice(2);
+
+  // If --gui flag is passed, start the GUI mode
+  if (args.includes('--gui')) {
+    startCalculatorUI();
+    return;
+  }
 
   // If no arguments are provided, start the interactive mode
   if (args.length === 0) {
@@ -24,6 +31,7 @@ function main(): void {
   // Check if we have exactly two arguments
   if (args.length !== 2) {
     console.error("Usage: node calculator.js <number1> <number2>");
+    console.error("       node calculator.js --gui (for terminal GUI)");
     process.exit(1);
   }
 
