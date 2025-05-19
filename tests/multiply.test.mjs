@@ -1,27 +1,29 @@
-import { strict as assert } from "assert";
 import { multiply } from "../src/commands/multiply.mjs";
 
-console.log("Testing multiply command...");
+describe('multiply function', () => {
+  console.log("Testing multiply command...");
 
-// Test: multiplies two positive numbers correctly
-assert.equal(multiply(2, 3), 6, "should multiply positive numbers correctly");
+  test('multiplies two positive numbers correctly', () => {
+    expect(multiply(2, 3)).toBe(6);
+  });
 
-// Test: handles negative numbers
-assert.equal(
-  multiply(-2, 3),
-  -6,
-  "should handle negative and positive numbers"
-);
-assert.equal(
-  multiply(2, -3),
-  -6,
-  "should handle positive and negative numbers"
-);
-assert.equal(multiply(-2, -3), 6, "should handle negative numbers");
+  test('handles negative numbers', () => {
+    expect(multiply(-2, 3)).toBe(-6);
+    expect(multiply(2, -3)).toBe(-6);
+    expect(multiply(-2, -3)).toBe(6);
+  });
 
-// Test: handles zero
-assert.equal(multiply(0, 3), 0, "should handle zero and positive numbers");
-assert.equal(multiply(2, 0), 0, "should handle positive and zero numbers");
-assert.equal(multiply(0, 0), 0, "should handle zeros");
+  test('handles zero', () => {
+    expect(multiply(0, 3)).toBe(0);
+    expect(multiply(2, 0)).toBe(0);
+    expect(multiply(0, 0)).toBe(0);
+  });
 
-console.log("All multiply tests passed!");
+  test('handles large numbers', () => {
+    expect(multiply(1000, 1000)).toBe(1000000);
+  });
+
+  afterAll(() => {
+    console.log("All multiply tests passed!");
+  });
+});

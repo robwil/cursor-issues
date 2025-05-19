@@ -1,19 +1,25 @@
-import { strict as assert } from "assert";
 import { sum } from "../src/commands/sum.mjs";
 
-console.log("Testing sum command...");
+describe('sum function', () => {
+  console.log("Testing sum command...");
 
-// Test: adds two positive numbers correctly
-assert.equal(sum(2, 3), 5, "should add positive numbers correctly");
+  test('adds two positive numbers correctly', () => {
+    expect(sum(2, 3)).toBe(5);
+  });
 
-// Test: handles negative numbers
-assert.equal(sum(-2, 3), 1, "should handle negative and positive numbers");
-assert.equal(sum(2, -3), -1, "should handle positive and negative numbers");
-assert.equal(sum(-2, -3), -5, "should handle negative numbers");
+  test('handles negative numbers', () => {
+    expect(sum(-2, 3)).toBe(1);
+    expect(sum(2, -3)).toBe(-1);
+    expect(sum(-2, -3)).toBe(-5);
+  });
 
-// Test: handles zero
-assert.equal(sum(0, 3), 3, "should handle zero and positive numbers");
-assert.equal(sum(2, 0), 2, "should handle positive and zero numbers");
-assert.equal(sum(0, 0), 0, "should handle zeros");
+  test('handles zero', () => {
+    expect(sum(0, 3)).toBe(3);
+    expect(sum(2, 0)).toBe(2);
+    expect(sum(0, 0)).toBe(0);
+  });
 
-console.log("All sum tests passed!");
+  afterAll(() => {
+    console.log("All sum tests passed!");
+  });
+});
