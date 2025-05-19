@@ -130,9 +130,9 @@ Follow these steps in order:
      ```
 
 ## Cleanup
-1. Return to the main branch:
+1. Return to the master branch:
    ```bash
-   git checkout main
+   git checkout master
    ```
 
 2. Optional: Remove any temporary files created during the workflow:
