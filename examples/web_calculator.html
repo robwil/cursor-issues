@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Web Calculator</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .calculator {
+            background-color: #f5f5f5;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .input-group {
+            margin-bottom: 15px;
+        }
+        input {
+            padding: 8px;
+            width: 100px;
+            margin-right: 10px;
+        }
+        button {
+            padding: 8px 15px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-right: 5px;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        #results {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #fff;
+            border-left: 4px solid #4CAF50;
+        }
+    </style>
+</head>
+<body>
+    <h1>Web Calculator Example</h1>
+    <p>This example demonstrates how to use the calculator functions in a web application.</p>
+    
+    <div class="calculator">
+        <div class="input-group">
+            <label for="num1">First Number:</label>
+            <input type="number" id="num1" value="10">
+            
+            <label for="num2">Second Number:</label>
+            <input type="number" id="num2" value="5">
+        </div>
+        
+        <div class="actions">
+            <button onclick="calculate('sum')">Add</button>
+            <button onclick="calculate('subtract')">Subtract</button>
+            <button onclick="calculate('multiply')">Multiply</button>
+            <button onclick="calculate('divide')">Divide</button>
+        </div>
+        
+        <div id="results">
+            <p>Results will appear here...</p>
+        </div>
+    </div>
+    
+    <script>
+        // Calculator functions (simplified versions of the Node.js implementations)
+        const calculator = {
+            sum: (a, b) => a + b,
+            subtract: (a, b) => a - b,
+            multiply: (a, b) => a * b,
+            divide: (a, b) => {
+                if (b === 0) throw new Error("Cannot divide by zero");
+                return a / b;
+            }
+        };
+        
+        function calculate(operation) {
+            const num1 = parseFloat(document.getElementById('num1').value);
+            const num2 = parseFloat(document.getElementById('num2').value);
+            const resultsDiv = document.getElementById('results');
+            
+            if (isNaN(num1) || isNaN(num2)) {
+                resultsDiv.innerHTML = '<p style="color: red">Please enter valid numbers</p>';
+                return;
+            }
+            
+            try {
+                let result;
+                let operationSymbol;
+                
+                switch(operation) {
+                    case 'sum':
+                        result = calculator.sum(num1, num2);
+                        operationSymbol = '+';
+                        break;
+                    case 'subtract':
+                        result = calculator.subtract(num1, num2);
+                        operationSymbol = '-';
+                        break;
+                    case 'multiply':
+                        result = calculator.multiply(num1, num2);
+                        operationSymbol = '*';
+                        break;
+                    case 'divide':
+                        result = calculator.divide(num1, num2);
+                        operationSymbol = '/';
+                        break;
+                }
+                
+                resultsDiv.innerHTML = `<p>${num1} ${operationSymbol} ${num2} = ${result}</p>`;
+            } catch (error) {
+                resultsDiv.innerHTML = `<p style="color: red">Error: ${error.message}</p>`;
+            }
+        }
+    </script>
+</body>
+</html> 
