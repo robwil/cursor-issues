@@ -12,6 +12,8 @@ pnpm install
 
 ## Usage
 
+### Command-Line Mode
+
 Run the calculator with two numbers as arguments:
 
 ```bash
@@ -33,6 +35,20 @@ Divide: 5 / 3 = 1.6666666666666667
 Power: 5 ^ 3 = 125
 ```
 
+### Interactive Mode
+
+Run the calculator without arguments to start the interactive mode:
+
+```bash
+pnpm start
+```
+
+This launches a user-friendly interface where you can:
+- Choose operations using arrow keys
+- Input numbers when prompted
+- See formatted results with proper decimal places
+- Perform multiple calculations in succession
+
 ## Development
 
 If you want to compile the TypeScript files:
@@ -51,9 +67,15 @@ Run all tests with:
 pnpm test
 ```
 
-Run specific tests using Jest's filtering capabilities:
+The project uses Jest projects to organize tests:
 
 ```bash
+# Run only unit tests
+pnpm test:unit
+
+# Run only integration tests
+pnpm test:integration
+
 # Run a specific test file
 pnpm test tests/sum.test.ts
 
@@ -76,3 +98,16 @@ This project uses:
 - Jest for testing with ts-jest for TypeScript support
 - ts-node for direct execution of TypeScript code
 - BigNumber.js for handling large number calculations
+- pnpm for package management
+- inquirer for interactive command-line interfaces
+- chalk for colorful terminal output
+
+## Project Structure
+
+The project is set up as a pnpm workspace with the following structure:
+- `src/` - Contains the calculator source code
+- `src/commands/` - Individual math operations
+- `src/interactiveMode.ts` - Interactive CLI interface
+- `tests/` - Test files for each operation
+- `docs/` - Project documentation
+- `dist/` - Compiled JavaScript output
