@@ -508,6 +508,10 @@ export function startCalculatorUI(): void {
   let row = 7;
   let col = 1;
 
+  // Save the position below 9 for equals button
+  const nineButtonRow = row + (buttonHeight + 1) * 2; // After 2 rows (1-3, 4-6, 7-9)
+  const nineButtonCol = col + (buttonWidth + 1) * 2; // After 2 columns (7, 8, 9)
+
   // Numbers 1-9
   for (let i = 1; i <= 9; i++) {
     const digit = String(i);
@@ -534,6 +538,11 @@ export function startCalculatorUI(): void {
     }
   });
 
+  // Equals button - place below 9 and to the right of decimal point
+  createButton('=', nineButtonRow, nineButtonCol, buttonWidth, buttonHeight, () => {
+    handleEquals();
+  }, 'black', 'green');
+
   // Operation buttons
   row = 7;
   col = 28;
@@ -558,11 +567,6 @@ export function startCalculatorUI(): void {
   createButton('^', row + (buttonHeight + 1) * 4, 1, buttonWidth, buttonHeight, () => {
     handleOperator('^');
   }, 'white', 'magenta');
-
-  // Equals button - highlight this with a different style and make it larger
-  createButton('=', row, col + buttonWidth + 1, buttonWidth, buttonHeight, () => {
-    handleEquals();
-  }, 'black', 'green');
   
   // Clear button
   createButton('C', row + (buttonHeight + 1) * 4, 1 + buttonWidth + 1, buttonWidth, buttonHeight, () => {
