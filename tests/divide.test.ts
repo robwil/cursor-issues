@@ -1,8 +1,6 @@
 import { divide } from "../src/commands/divide";
 
 describe('divide function', () => {
-  console.log("Testing divide command...");
-
   test('divides positive numbers correctly', () => {
     expect(divide(6, 3)).toBe(2);
   });
@@ -32,9 +30,5 @@ describe('divide function', () => {
     expect(() => {
       divide(5, 0);
     }).toThrow("Cannot divide by zero");
-  });
-
-  afterAll(() => {
-    console.log("All divide tests passed!");
   });
 }); 

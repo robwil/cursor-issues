@@ -30,6 +30,7 @@ Sum: 5 + 3 = 8
 Subtract: 5 - 3 = 2
 Multiply: 5 * 3 = 15
 Divide: 5 / 3 = 1.6666666666666667
+Power: 5 ^ 3 = 125
 ```
 
 ## Development
@@ -50,13 +51,14 @@ Run all tests with:
 pnpm test
 ```
 
-Run specific tests:
+Run specific tests using Jest's filtering capabilities:
 
 ```bash
-pnpm test:sum
-pnpm test:subtract
-pnpm test:multiply
-pnpm test:divide
+# Run a specific test file
+pnpm test tests/sum.test.ts
+
+# Run tests with name pattern
+pnpm test -t "adds two numbers"
 ```
 
 ## Available Commands
@@ -64,7 +66,8 @@ pnpm test:divide
 - `sum`: Adds two numbers together
 - `subtract`: Subtracts the second number from the first 
 - `multiply`: Multiplies two numbers together
-- `divide`: Divides the first number by the second 
+- `divide`: Divides the first number by the second
+- `power`: Raises the first number to the power of the second number
 
 ## Technology
 
@@ -72,3 +75,4 @@ This project uses:
 - TypeScript for type-safe code
 - Jest for testing with ts-jest for TypeScript support
 - ts-node for direct execution of TypeScript code
+- BigNumber.js for handling large number calculations

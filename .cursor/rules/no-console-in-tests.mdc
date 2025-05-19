@@ -1,0 +1,72 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+# No Console Logs in Tests
+
+Rule to prevent console.log statements in test files.
+
+<rule>
+name: no_console_logs_in_tests
+description: Prevents using console.log statements in test files
+filters:
+  # Match test files
+  - type: file_extension
+    pattern: "\\.test\\.(ts|js|tsx|jsx)$"
+  # Match file edits and creations
+  - type: event
+    pattern: "file_edit|file_create"
+
+actions:
+  - type: reject
+    conditions:
+      # Reject console.log statements
+      - pattern: "console\\.log\\("
+        message: "Console.log statements are not allowed in test files"
+
+  - type: suggest
+    message: |
+      Avoid using console.log in test files:
+
+      1. For test debugging:
+         - Use Jest's built-in debugging features
+         - Use conditional breakpoints in your IDE
+         - Use test assertions to validate expectations
+
+      2. For test reporting:
+         - Use Jest's built-in reporting
+         - Configure reporters in jest.config.js if needed
+         - Use afterAll/beforeAll for test setup/teardown without logging
+
+      3. Alternatives to console.log:
+         - jest.spyOn(console, 'log') to test functions that use console.log
+         - Custom test reporters for specialized output
+         - Log to file during tests if absolutely necessary
+
+examples:
+  - input: |
+      // Bad: Using console.log in tests
+      describe('my test', () => {
+        console.log("Starting test");
+        test('should work', () => {
+          console.log("In test");
+          expect(true).toBe(true);
+        });
+        afterAll(() => {
+          console.log("Test finished");
+        });
+      });
+
+      // Good: Clean tests without console.log
+      describe('my test', () => {
+        test('should work', () => {
+          expect(true).toBe(true);
+        });
+      });
+    output: "Test without console.log statements"
+
+metadata:
+  priority: medium
+  version: 1.0
+</rule>

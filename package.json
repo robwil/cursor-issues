@@ -6,12 +6,7 @@
   "scripts": {
     "build": "tsc",
     "start": "ts-node src/calculator.ts",
-    "test": "jest --config jest.config.cjs",
-    "test:sum": "jest tests/sum.test.ts --config jest.config.cjs",
-    "test:subtract": "jest tests/subtract.test.ts --config jest.config.cjs",
-    "test:multiply": "jest tests/multiply.test.ts --config jest.config.cjs",
-    "test:divide": "jest tests/divide.test.ts --config jest.config.cjs",
-    "test:power": "jest tests/power.test.ts --config jest.config.cjs"
+    "test": "jest --config jest.config.cjs"
   },
   "repository": {
     "type": "git",

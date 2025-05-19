@@ -2,8 +2,6 @@ import { power } from "../src/commands/power";
 import BigNumber from 'bignumber.js';
 
 describe('power function', () => {
-  console.log("Testing power command...");
-
   test('calculates positive base with positive exponent correctly', () => {
     expect(power(2, 3)).toBe(8);
     expect(power(5, 2)).toBe(25);
@@ -34,9 +32,5 @@ describe('power function', () => {
     // Calculate manually what the result should be using BigNumber
     const expected = new BigNumber(2).exponentiatedBy(50).toNumber();
     expect(power(2, 50)).toBe(expected);
-  });
-
-  afterAll(() => {
-    console.log("All power tests passed!");
   });
 }); 
