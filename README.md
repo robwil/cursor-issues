@@ -7,7 +7,7 @@ A simple Node.js calculator CLI application that performs arithmetic operations.
 ```bash
 git clone git@github.com:robwil/cursor-issues.git
 cd cursor-issues
-npm install
+pnpm install
 ```
 
 ## Usage
@@ -15,19 +15,19 @@ npm install
 Run the calculator with two numbers as arguments:
 
 ```bash
-npm start -- <number1> <number2>
+pnpm start <number1> <number2>
 ```
 
 or
 
 ```bash
-node src/calculator.js <number1> <number2>
+node src/calculator.mjs <number1> <number2>
 ```
 
 Example:
 
 ```bash
-npm start -- 5 3
+pnpm start 5 3
 ```
 
 Output:
@@ -40,10 +40,19 @@ Divide: 5 / 3 = 1.6666666666666667
 
 ## Testing
 
-Run tests with:
+Run all tests with:
 
 ```bash
-npm test
+pnpm test
+```
+
+Run specific tests:
+
+```bash
+pnpm test:sum
+pnpm test:subtract
+pnpm test:multiply
+pnpm test:divide
 ```
 
 ## Available Commands

@@ -4,11 +4,11 @@
   "type": "module",
   "main": "src/calculator.mjs",
   "scripts": {
-    "test": "bazelisk test //tests:all",
-    "test:sum": "bazelisk test //tests:sum_test",
-    "test:subtract": "bazelisk test //tests:subtract_test",
-    "test:multiply": "bazelisk test //tests:multiply_test",
-    "test:divide": "bazelisk test //tests:divide_test",
+    "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js",
+    "test:sum": "node --experimental-vm-modules node_modules/jest/bin/jest.js tests/sum.test.mjs",
+    "test:subtract": "node --experimental-vm-modules node_modules/jest/bin/jest.js tests/subtract.test.mjs",
+    "test:multiply": "node --experimental-vm-modules node_modules/jest/bin/jest.js tests/multiply.test.mjs",
+    "test:divide": "node --experimental-vm-modules node_modules/jest/bin/jest.js tests/divide.test.mjs",
     "start": "node src/calculator.mjs"
   },
   "repository": {
@@ -22,5 +22,8 @@
     "url": "https://github.com/robwil/cursor-issues/issues"
   },
   "homepage": "https://github.com/robwil/cursor-issues#readme",
-  "description": ""
+  "description": "",
+  "devDependencies": {
+    "jest": "^29.5.0"
+  }
 }
