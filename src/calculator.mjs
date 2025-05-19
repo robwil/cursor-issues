@@ -1,5 +1,16 @@
 #!/usr/bin/env node
 
+/**
+ * Calculator CLI Application
+ * 
+ * This is a command-line calculator application that performs basic arithmetic operations
+ * on two numbers provided as command-line arguments.
+ * 
+ * @file Main calculator application entry point
+ * @author Cursor Issues Project
+ * @version 1.0.0
+ */
+
 import { sum } from "./commands/sum.mjs";
 import { subtract } from "./commands/subtract.mjs";
 import { multiply } from "./commands/multiply.mjs";
@@ -7,7 +18,20 @@ import { divide } from "./commands/divide.mjs";
 
 /**
  * Main calculator function that processes command line arguments
- * and outputs the results of sum and subtract operations
+ * and outputs the results of arithmetic operations
+ * 
+ * The function takes two numbers as command-line arguments and
+ * performs addition, subtraction, multiplication, and division on them.
+ * 
+ * @example
+ * // Run from command line
+ * // node calculator.mjs 10 5
+ * 
+ * // Output:
+ * // Sum: 10 + 5 = 15
+ * // Subtract: 10 - 5 = 5
+ * // Multiply: 10 * 5 = 50
+ * // Divide: 10 / 5 = 2
  */
 function main() {
   // Get command line arguments (skip the first two which are node and script path)
