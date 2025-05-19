@@ -61,7 +61,18 @@ Follow these steps in order:
    - Remove the "WIP" label: `gh issue edit <issue-number> --remove-label WIP`
    - Create a pull request:
      ```bash
-     gh pr create --title "Fix issue #<issue-number>" --body "This PR implements all tasks from issue #<issue-number>:\n\n- Task 1 description\n- Task 2 description\n\nCloses #<issue-number>"
+     # Create a file with the PR description 
+     cat > pr-body.txt << EOF
+     This PR implements all tasks from issue #<issue-number>:
+     
+     - Task 1 description
+     - Task 2 description
+     
+     Closes #<issue-number>
+     EOF
+     
+     # Create the PR using the file
+     gh pr create --title "Fix issue #<issue-number>" --body-file pr-body.txt
      ```
 
 ## Troubleshooting
